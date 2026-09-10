@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { X } from 'lucide-react'
 
 export default function SignUp() {
   const router = useRouter()
@@ -43,7 +44,14 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
+      <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full relative">
+        <Link
+          href="/"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-1.5 transition-colors"
+          aria-label="Close"
+        >
+          <X className="w-5 h-5" />
+        </Link>
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-blue-600 mb-2">DealVault</h1>
           <p className="text-gray-600">Create your account</p>
