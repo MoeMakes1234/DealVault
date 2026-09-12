@@ -1,8 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Trash2, Edit2, X } from 'lucide-react'
+import Link from 'next/link'
+import { Plus, Trash2, Edit2, X, Search, ArrowUpDown, Building2, ChevronRight } from 'lucide-react'
 import { useStore, Deal } from '@/lib/store'
+import { useToast } from '@/lib/toast'
+
+type SortKey = 'newest' | 'profit' | 'budget-usage' | 'address'
 
 const emptyForm = {
   address: '',
@@ -22,12 +26,30 @@ export default function DealsPage() {
   const updateDeal = useStore((s) => s.updateDeal)
   const deleteDeal = useStore((s) => s.deleteDeal)
 
+  const toast = useToast((s) => s.show)
+
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(emptyForm)
   const [filter, setFilter] = useState<'all' | Deal['status']>('all')
+  const [search, setSearch] = useState('')
+  const [sort, setSort] = useState<SortKey>('newest')
 
-  const filteredDeals = filter === 'all' ? deals : deals.filter((d) => d.status === filter)
+  const filteredDeals = deals
+    .filter((d) => filter === 'all' || d.status === filter)
+    .filter((d) => d.address.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => {
+      switch (sort) {
+        case 'profit':
+          return b.expectedProfit - a.expectedProfit
+        case 'budget-usage':
+          return b.spent / (b.budget || 1) - a.spent / (a.budget || 1)
+        case 'address':
+          return a.address.localeCompare(b.address)
+        default:
+          return Number(b.id) - Number(a.id)
+      }
+    })
 
   const openNew = () => {
     setForm(emptyForm)
@@ -68,8 +90,10 @@ export default function DealsPage() {
 
     if (editingId) {
       updateDeal(editingId, payload)
+      toast('Deal updated')
     } else {
       addDeal(payload)
+      toast('Deal added')
     }
     setShowForm(false)
     setForm(emptyForm)
@@ -92,19 +116,45 @@ export default function DealsPage() {
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-2 mb-6">
-        {(['all', 'planning', 'in-progress', 'completed'] as const).map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              filter === f ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
-          </button>
-        ))}
+      {/* Filters + search + sort */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-6">
+        <div className="flex gap-2 flex-wrap">
+          {(['all', 'planning', 'in-progress', 'completed'] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                filter === f ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1).replace('-', ' ')}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <div className="relative">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search address..."
+              className="pl-9 pr-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-48"
+            />
+          </div>
+          <div className="relative">
+            <ArrowUpDown className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as SortKey)}
+              className="pl-9 pr-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none appearance-none bg-white cursor-pointer"
+            >
+              <option value="newest">Newest</option>
+              <option value="profit">Highest profit</option>
+              <option value="budget-usage">Budget usage</option>
+              <option value="address">Address (A-Z)</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Form Modal */}
@@ -229,15 +279,34 @@ export default function DealsPage() {
       {/* Deals List */}
       <div className="space-y-4">
         {filteredDeals.length === 0 ? (
-          <div className="card text-center py-12 text-gray-500">No deals in this filter yet.</div>
+          <div className="card text-center py-16">
+            <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Building2 className="w-7 h-7 text-blue-500" />
+            </div>
+            <h3 className="font-semibold text-gray-900 mb-1">
+              {search || filter !== 'all' ? 'No matching deals' : 'No deals yet'}
+            </h3>
+            <p className="text-gray-500 text-sm mb-5 max-w-sm mx-auto">
+              {search || filter !== 'all'
+                ? 'Try adjusting your search or filters.'
+                : 'Add your first property to start tracking budgets, contractors, and profit.'}
+            </p>
+            {!search && filter === 'all' && (
+              <button onClick={openNew} className="btn-primary inline-flex items-center gap-2 text-sm">
+                <Plus className="w-4 h-4" /> Add Your First Deal
+              </button>
+            )}
+          </div>
         ) : (
           filteredDeals.map((deal) => (
-            <div key={deal.id} className="card hover:shadow-md transition-shadow">
+            <div key={deal.id} className="card hover:shadow-md transition-shadow animate-fade-in">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex-1 grid grid-cols-2 md:grid-cols-5 gap-4">
                   <div className="col-span-2 md:col-span-1">
                     <p className="text-xs text-gray-500 mb-1">Address</p>
-                    <p className="font-semibold text-gray-900">{deal.address}</p>
+                    <Link href={`/dashboard/deals/${deal.id}`} className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
+                      {deal.address}
+                    </Link>
                     {deal.startDate && (
                       <p className="text-xs text-gray-400 mt-1">
                         {deal.startDate} → {deal.targetCompletionDate || 'TBD'}
@@ -284,6 +353,13 @@ export default function DealsPage() {
                   </div>
                 </div>
                 <div className="flex gap-2 md:flex-col md:gap-2 shrink-0">
+                  <Link
+                    href={`/dashboard/deals/${deal.id}`}
+                    className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="View details"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Link>
                   <button
                     onClick={() => openEdit(deal)}
                     className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -292,7 +368,12 @@ export default function DealsPage() {
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => deleteDeal(deal.id)}
+                    onClick={() => {
+                      if (confirm(`Delete "${deal.address}"? This also removes its budget lines and tasks.`)) {
+                        deleteDeal(deal.id)
+                        toast('Deal deleted', 'info')
+                      }
+                    }}
                     className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     title="Delete"
                   >

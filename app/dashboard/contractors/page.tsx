@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Plus, Trash2, X, Star, Phone, Mail } from 'lucide-react'
 import { useStore, Contractor } from '@/lib/store'
+import { useToast } from '@/lib/toast'
 
 const emptyForm = {
   name: '',
@@ -18,6 +19,7 @@ const emptyForm = {
 export default function ContractorsPage() {
   const contractors = useStore((s) => s.contractors)
   const deals = useStore((s) => s.deals)
+  const toast = useToast((s) => s.show)
   const addContractor = useStore((s) => s.addContractor)
   const deleteContractor = useStore((s) => s.deleteContractor)
   const updateContractor = useStore((s) => s.updateContractor)
@@ -39,6 +41,7 @@ export default function ContractorsPage() {
     })
     setForm(emptyForm)
     setShowForm(false)
+    toast('Contractor added')
   }
 
   const dealAddress = (id?: string) => deals.find((d) => d.id === id)?.address
@@ -152,7 +155,7 @@ export default function ContractorsPage() {
                 <h3 className="font-bold text-gray-900">{c.name}</h3>
                 <p className="text-sm text-gray-500">{c.trade}</p>
               </div>
-              <button onClick={() => deleteContractor(c.id)} className="text-gray-400 hover:text-red-600">
+              <button onClick={() => { deleteContractor(c.id); toast('Contractor removed', 'info') }} className="text-gray-400 hover:text-red-600">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Plus, Trash2, X, FileText, FilePlus2, Stamp, ClipboardCheck, ScrollText, File } from 'lucide-react'
 import { useStore, DocumentItem } from '@/lib/store'
+import { useToast } from '@/lib/toast'
 
 const categoryIcon: Record<DocumentItem['category'], any> = {
   contract: ScrollText,
@@ -30,6 +31,7 @@ const emptyForm = {
 export default function DocumentsPage() {
   const documents = useStore((s) => s.documents)
   const deals = useStore((s) => s.deals)
+  const toast = useToast((s) => s.show)
   const addDocument = useStore((s) => s.addDocument)
   const deleteDocument = useStore((s) => s.deleteDocument)
 
@@ -51,6 +53,7 @@ export default function DocumentsPage() {
     })
     setForm(emptyForm)
     setShowForm(false)
+    toast('Document logged')
   }
 
   return (
@@ -175,7 +178,7 @@ export default function DocumentsPage() {
                       </p>
                     </div>
                   </div>
-                  <button onClick={() => deleteDocument(doc.id)} className="text-gray-400 hover:text-red-600 p-2">
+                  <button onClick={() => { deleteDocument(doc.id); toast('Document removed', 'info') }} className="text-gray-400 hover:text-red-600 p-2">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>

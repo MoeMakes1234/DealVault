@@ -44,15 +44,43 @@ export interface TimelineTask {
   dueDate?: string
 }
 
+export type BudgetCategory =
+  | 'acquisition'
+  | 'demo'
+  | 'framing'
+  | 'electrical'
+  | 'plumbing'
+  | 'hvac'
+  | 'roofing'
+  | 'finishes'
+  | 'permits'
+  | 'landscaping'
+  | 'contingency'
+  | 'other'
+
+export interface BudgetItem {
+  id: string
+  dealId: string
+  category: BudgetCategory
+  label: string
+  budgeted: number
+  spent: number
+}
+
 interface DealVaultState {
   deals: Deal[]
   contractors: Contractor[]
   documents: DocumentItem[]
   tasks: TimelineTask[]
+  budgetItems: BudgetItem[]
 
   addDeal: (deal: Omit<Deal, 'id'>) => void
   updateDeal: (id: string, updates: Partial<Deal>) => void
   deleteDeal: (id: string) => void
+
+  addBudgetItem: (b: Omit<BudgetItem, 'id'>) => void
+  updateBudgetItem: (id: string, updates: Partial<BudgetItem>) => void
+  deleteBudgetItem: (id: string) => void
 
   addContractor: (c: Omit<Contractor, 'id'>) => void
   updateContractor: (id: string, updates: Partial<Contractor>) => void
@@ -114,6 +142,18 @@ const initialTasks: TimelineTask[] = [
   { id: 't5', dealId: '1', title: 'Final walkthrough & list', status: 'pending', dueDate: '2026-06-10' },
 ]
 
+const initialBudgetItems: BudgetItem[] = [
+  { id: 'b1', dealId: '1', category: 'demo', label: 'Demolition & debris removal', budgeted: 8000, spent: 7500 },
+  { id: 'b2', dealId: '1', category: 'electrical', label: 'Full rewire + panel', budgeted: 12000, spent: 6200 },
+  { id: 'b3', dealId: '1', category: 'plumbing', label: 'Repipe + fixtures', budgeted: 10000, spent: 4800 },
+  { id: 'b4', dealId: '1', category: 'finishes', label: 'Kitchen & bath finishes', budgeted: 25000, spent: 15000 },
+  { id: 'b5', dealId: '1', category: 'permits', label: 'City permits & inspections', budgeted: 5000, spent: 3500 },
+  { id: 'b6', dealId: '1', category: 'contingency', label: 'Contingency reserve', budgeted: 15000, spent: 5000 },
+  { id: 'b7', dealId: '2', category: 'finishes', label: 'Cosmetic rehab', budgeted: 35000, spent: 38000 },
+  { id: 'b8', dealId: '2', category: 'permits', label: 'Permits', budgeted: 5000, spent: 4500 },
+  { id: 'b9', dealId: '2', category: 'contingency', label: 'Contingency', budgeted: 10000, spent: 7500 },
+]
+
 export const useStore = create<DealVaultState>()(
   persist(
     (set) => ({
@@ -121,6 +161,7 @@ export const useStore = create<DealVaultState>()(
       contractors: initialContractors,
       documents: initialDocuments,
       tasks: initialTasks,
+      budgetItems: initialBudgetItems,
 
       addDeal: (deal) =>
         set((state) => ({
@@ -131,7 +172,22 @@ export const useStore = create<DealVaultState>()(
           deals: state.deals.map((d) => (d.id === id ? { ...d, ...updates } : d)),
         })),
       deleteDeal: (id) =>
-        set((state) => ({ deals: state.deals.filter((d) => d.id !== id) })),
+        set((state) => ({
+          deals: state.deals.filter((d) => d.id !== id),
+          budgetItems: state.budgetItems.filter((b) => b.dealId !== id),
+          tasks: state.tasks.filter((t) => t.dealId !== id),
+        })),
+
+      addBudgetItem: (b) =>
+        set((state) => ({
+          budgetItems: [...state.budgetItems, { ...b, id: Date.now().toString() }],
+        })),
+      updateBudgetItem: (id, updates) =>
+        set((state) => ({
+          budgetItems: state.budgetItems.map((b) => (b.id === id ? { ...b, ...updates } : b)),
+        })),
+      deleteBudgetItem: (id) =>
+        set((state) => ({ budgetItems: state.budgetItems.filter((b) => b.id !== id) })),
 
       addContractor: (c) =>
         set((state) => ({
