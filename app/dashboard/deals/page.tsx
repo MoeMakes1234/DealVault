@@ -15,6 +15,7 @@ const emptyForm = {
   spent: '',
   saleTarget: '',
   status: 'planning' as Deal['status'],
+  projectType: 'flip' as Deal['projectType'],
   startDate: '',
   targetCompletionDate: '',
   notes: '',
@@ -65,6 +66,7 @@ export default function DealsPage() {
       spent: String(deal.spent),
       saleTarget: deal.saleTarget ? String(deal.saleTarget) : '',
       status: deal.status,
+      projectType: deal.projectType || 'flip',
       startDate: deal.startDate || '',
       targetCompletionDate: deal.targetCompletionDate || '',
       notes: deal.notes || '',
@@ -82,6 +84,7 @@ export default function DealsPage() {
       spent: Number(form.spent) || 0,
       saleTarget: form.saleTarget ? Number(form.saleTarget) : undefined,
       status: form.status,
+      projectType: form.projectType,
       expectedProfit: (Number(form.saleTarget) || 0) - (Number(form.acquisitionPrice) || 0) - (Number(form.budget) || 0),
       startDate: form.startDate || undefined,
       targetCompletionDate: form.targetCompletionDate || undefined,
@@ -183,6 +186,36 @@ export default function DealsPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   placeholder="123 Main St, Brooklyn NY"
                 />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-xs font-medium text-gray-600 mb-1">Project Type</label>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  {([
+                    ['flip', 'Flip'],
+                    ['rental', 'Rental'],
+                    ['multifamily', 'Multifamily'],
+                    ['new-construction', 'New Build'],
+                    ['mixed-use', 'Mixed-Use'],
+                  ] as const).map(([val, label]) => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => setForm({ ...form, projectType: val })}
+                      className={`px-2 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                        form.projectType === val
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {form.projectType && form.projectType !== 'flip' && form.projectType !== 'rental' && (
+                  <p className="text-xs text-blue-600 mt-2">
+                    Development project — after saving, open it to add individual units.
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Acquisition Price ($)</label>
@@ -307,6 +340,18 @@ export default function DealsPage() {
                     <Link href={`/dashboard/deals/${deal.id}`} className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
                       {deal.address}
                     </Link>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      {deal.projectType && deal.projectType !== 'flip' && (
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 capitalize">
+                          {deal.projectType.replace('-', ' ')}
+                        </span>
+                      )}
+                      {deal.units && deal.units.length > 0 && (
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">
+                          {deal.units.length} units
+                        </span>
+                      )}
+                    </div>
                     {deal.startDate && (
                       <p className="text-xs text-gray-400 mt-1">
                         {deal.startDate} → {deal.targetCompletionDate || 'TBD'}

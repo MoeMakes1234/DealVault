@@ -4,10 +4,10 @@ import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
-  ArrowLeft, Plus, Trash2, X, MapPin, Calendar, TrendingUp, Users, FileText,
+  ArrowLeft, Plus, Trash2, X, MapPin, Calendar, TrendingUp, Users, FileText, Building2,
   Clock, DollarSign, AlertTriangle, Check, Circle, Clock3, Image as ImageIcon, Upload,
 } from 'lucide-react'
-import { useStore, BudgetCategory, TimelineTask } from '@/lib/store'
+import { useStore, BudgetCategory, TimelineTask, Unit } from '@/lib/store'
 import { useToast } from '@/lib/toast'
 
 const categoryLabels: Record<BudgetCategory, string> = {
@@ -39,9 +39,14 @@ export default function DealDetailPage() {
   const updateTask = useStore((s) => s.updateTask)
   const addDealPhoto = useStore((s) => s.addDealPhoto)
   const removeDealPhoto = useStore((s) => s.removeDealPhoto)
+  const addUnit = useStore((s) => s.addUnit)
+  const updateUnit = useStore((s) => s.updateUnit)
+  const deleteUnit = useStore((s) => s.deleteUnit)
 
   const [showBudgetForm, setShowBudgetForm] = useState(false)
   const [bForm, setBForm] = useState({ category: 'finishes' as BudgetCategory, label: '', budgeted: '', spent: '' })
+  const [showUnitForm, setShowUnitForm] = useState(false)
+  const [uForm, setUForm] = useState({ name: '', beds: '', baths: '', sqft: '', status: 'planned' as Unit['status'], targetRent: '', targetSalePrice: '' })
 
   if (!deal) {
     return (
@@ -58,6 +63,14 @@ export default function DealDetailPage() {
   const allIn = deal.acquisitionPrice + (totalBudgeted || deal.budget)
   const projectedProfit = (deal.saleTarget || 0) - deal.acquisitionPrice - (totalSpent || deal.spent)
 
+  const isDevelopment = deal.projectType && ['multifamily', 'new-construction', 'mixed-use'].includes(deal.projectType)
+  const units = deal.units || []
+  const totalUnitRent = units.reduce((s, u) => s + (u.targetRent || 0), 0)
+  const totalUnitSalePrice = units.reduce((s, u) => s + (u.targetSalePrice || 0), 0)
+  const totalSqft = units.reduce((s, u) => s + u.sqft, 0)
+  const unitsSold = units.filter((u) => u.status === 'sold').length
+  const unitsLeased = units.filter((u) => u.status === 'leased').length
+
   const handleAddBudget = (e: React.FormEvent) => {
     e.preventDefault()
     addBudgetItem({
@@ -70,6 +83,22 @@ export default function DealDetailPage() {
     setBForm({ category: 'finishes', label: '', budgeted: '', spent: '' })
     setShowBudgetForm(false)
     toast('Budget line added')
+  }
+
+  const handleAddUnit = (e: React.FormEvent) => {
+    e.preventDefault()
+    addUnit(dealId, {
+      name: uForm.name,
+      beds: Number(uForm.beds) || 0,
+      baths: Number(uForm.baths) || 0,
+      sqft: Number(uForm.sqft) || 0,
+      status: uForm.status,
+      targetRent: uForm.targetRent ? Number(uForm.targetRent) : undefined,
+      targetSalePrice: uForm.targetSalePrice ? Number(uForm.targetSalePrice) : undefined,
+    })
+    setUForm({ name: '', beds: '', baths: '', sqft: '', status: 'planned', targetRent: '', targetSalePrice: '' })
+    setShowUnitForm(false)
+    toast('Unit added')
   }
 
   const cycleTask = (task: TimelineTask) => {
@@ -114,6 +143,11 @@ export default function DealDetailPage() {
             >
               {deal.status.charAt(0).toUpperCase() + deal.status.slice(1).replace('-', ' ')}
             </span>
+            {deal.projectType && (
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 capitalize">
+                {deal.projectType.replace('-', ' ')}
+              </span>
+            )}
           </div>
           {(deal.startDate || deal.targetCompletionDate) && (
             <p className="text-sm text-gray-500 flex items-center gap-1.5">
@@ -150,6 +184,104 @@ export default function DealDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Budget breakdown - main column */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Units section - only for development project types */}
+          {isDevelopment && (
+            <div className="card">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-lg font-bold flex items-center gap-2"><Building2 className="w-5 h-5 text-indigo-500" /> Units</h3>
+                <button onClick={() => setShowUnitForm(true)} className="text-blue-600 text-sm font-medium flex items-center gap-1 hover:text-blue-700">
+                  <Plus className="w-4 h-4" /> Add Unit
+                </button>
+              </div>
+              {units.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 my-4">
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-xs text-gray-500">Total Units</p>
+                      <p className="text-xl font-bold">{units.length}</p>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-xs text-gray-500">Total Sq Ft</p>
+                      <p className="text-xl font-bold">{totalSqft.toLocaleString()}</p>
+                    </div>
+                    {totalUnitRent > 0 && (
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-xs text-gray-500">Gross Rent/mo</p>
+                        <p className="text-xl font-bold text-green-600">${(totalUnitRent / 1000).toFixed(1)}K</p>
+                      </div>
+                    )}
+                    {totalUnitSalePrice > 0 && (
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-xs text-gray-500">Total Sellout</p>
+                        <p className="text-xl font-bold text-green-600">${(totalUnitSalePrice / 1000000).toFixed(2)}M</p>
+                      </div>
+                    )}
+                    {(unitsSold > 0 || unitsLeased > 0) && (
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-xs text-gray-500">Sold / Leased</p>
+                        <p className="text-xl font-bold">{unitsSold + unitsLeased}/{units.length}</p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="text-left text-gray-500 border-b border-gray-100">
+                          <th className="py-2 pr-3 font-medium">Unit</th>
+                          <th className="py-2 pr-3 font-medium">Bed/Bath</th>
+                          <th className="py-2 pr-3 font-medium">Sq Ft</th>
+                          <th className="py-2 pr-3 font-medium">Rent / Sale</th>
+                          <th className="py-2 pr-3 font-medium">Status</th>
+                          <th className="py-2 font-medium"></th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {units.map((u) => (
+                          <tr key={u.id}>
+                            <td className="py-2.5 pr-3 font-medium text-gray-900">{u.name}</td>
+                            <td className="py-2.5 pr-3 text-gray-600">{u.beds}bd / {u.baths}ba</td>
+                            <td className="py-2.5 pr-3 text-gray-600">{u.sqft.toLocaleString()}</td>
+                            <td className="py-2.5 pr-3 text-gray-600">
+                              {u.targetRent ? `$${u.targetRent.toLocaleString()}/mo` : u.targetSalePrice ? `$${u.targetSalePrice.toLocaleString()}` : '—'}
+                            </td>
+                            <td className="py-2.5 pr-3">
+                              <select
+                                value={u.status}
+                                onChange={(e) => updateUnit(dealId, u.id, { status: e.target.value as Unit['status'] })}
+                                className={`text-xs font-medium px-2 py-1 rounded-full border-0 outline-none cursor-pointer capitalize ${
+                                  u.status === 'sold' ? 'bg-green-100 text-green-700'
+                                  : u.status === 'leased' ? 'bg-blue-100 text-blue-700'
+                                  : u.status === 'complete' ? 'bg-purple-100 text-purple-700'
+                                  : u.status === 'under-construction' ? 'bg-amber-100 text-amber-700'
+                                  : 'bg-gray-100 text-gray-600'
+                                }`}
+                              >
+                                <option value="planned">Planned</option>
+                                <option value="under-construction">Under Construction</option>
+                                <option value="complete">Complete</option>
+                                <option value="leased">Leased</option>
+                                <option value="sold">Sold</option>
+                              </select>
+                            </td>
+                            <td className="py-2.5 text-right">
+                              <button onClick={() => { deleteUnit(dealId, u.id); toast('Unit removed', 'info') }} className="text-gray-300 hover:text-red-600">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-8 text-gray-400 text-sm">
+                  No units yet. Add each apartment, townhome, or unit to track status, rent, and sellout.
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="card">
             <div className="flex items-center justify-between mb-1">
               <h3 className="text-lg font-bold">Budget Breakdown</h3>
@@ -311,6 +443,63 @@ export default function DealDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Add unit modal */}
+      {showUnitForm && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50" onClick={() => setShowUnitForm(false)}>
+          <form onSubmit={handleAddUnit} onClick={(e) => e.stopPropagation()} className="bg-white rounded-xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-bold">Add Unit</h3>
+              <button type="button" onClick={() => setShowUnitForm(false)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Unit Name / Number</label>
+                <input required value={uForm.name} onChange={(e) => setUForm({ ...uForm, name: e.target.value })} placeholder="Unit 2A" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Beds</label>
+                  <input type="number" value={uForm.beds} onChange={(e) => setUForm({ ...uForm, beds: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Baths</label>
+                  <input type="number" step="0.5" value={uForm.baths} onChange={(e) => setUForm({ ...uForm, baths: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Sq Ft</label>
+                  <input type="number" value={uForm.sqft} onChange={(e) => setUForm({ ...uForm, sqft: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Target Rent ($/mo)</label>
+                  <input type="number" value={uForm.targetRent} onChange={(e) => setUForm({ ...uForm, targetRent: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Target Sale ($)</label>
+                  <input type="number" value={uForm.targetSalePrice} onChange={(e) => setUForm({ ...uForm, targetSalePrice: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Status</label>
+                <select value={uForm.status} onChange={(e) => setUForm({ ...uForm, status: e.target.value as Unit['status'] })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                  <option value="planned">Planned</option>
+                  <option value="under-construction">Under Construction</option>
+                  <option value="complete">Complete</option>
+                  <option value="leased">Leased</option>
+                  <option value="sold">Sold</option>
+                </select>
+              </div>
+              <p className="text-xs text-gray-400">Tip: use rent for buy-and-hold units, sale price for units you'll sell individually.</p>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button type="button" onClick={() => setShowUnitForm(false)} className="btn-secondary">Cancel</button>
+              <button type="submit" className="btn-primary">Add Unit</button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* Add budget modal */}
       {showBudgetForm && (

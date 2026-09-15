@@ -1,6 +1,19 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+export type ProjectType = 'flip' | 'rental' | 'multifamily' | 'new-construction' | 'mixed-use'
+
+export interface Unit {
+  id: string
+  name: string
+  beds: number
+  baths: number
+  sqft: number
+  status: 'planned' | 'under-construction' | 'complete' | 'leased' | 'sold'
+  targetRent?: number
+  targetSalePrice?: number
+}
+
 export interface Deal {
   id: string
   address: string
@@ -14,6 +27,8 @@ export interface Deal {
   targetCompletionDate?: string
   notes?: string
   photos?: string[]
+  projectType?: ProjectType
+  units?: Unit[]
 }
 
 export interface Settings {
@@ -108,6 +123,9 @@ interface DealVaultState {
   deleteDeal: (id: string) => void
   addDealPhoto: (dealId: string, dataUrl: string) => void
   removeDealPhoto: (dealId: string, index: number) => void
+  addUnit: (dealId: string, unit: Omit<Unit, 'id'>) => void
+  updateUnit: (dealId: string, unitId: string, updates: Partial<Unit>) => void
+  deleteUnit: (dealId: string, unitId: string) => void
 
   addAnalysis: (a: Omit<SavedAnalysis, 'id'>) => void
   deleteAnalysis: (id: string) => void
@@ -141,6 +159,7 @@ const initialDeals: Deal[] = [
     saleTarget: 410000,
     startDate: '2026-02-01',
     targetCompletionDate: '2026-06-15',
+    projectType: 'flip',
   },
   {
     id: '2',
@@ -153,6 +172,28 @@ const initialDeals: Deal[] = [
     saleTarget: 292000,
     startDate: '2025-11-01',
     targetCompletionDate: '2026-02-01',
+    projectType: 'flip',
+  },
+  {
+    id: '3',
+    address: '88 Grove St, Jersey City NJ',
+    acquisitionPrice: 1200000,
+    budget: 2400000,
+    spent: 850000,
+    status: 'in-progress',
+    expectedProfit: 1150000,
+    saleTarget: 4750000,
+    startDate: '2026-01-15',
+    targetCompletionDate: '2027-06-01',
+    projectType: 'multifamily',
+    units: [
+      { id: 'u1', name: 'Unit 1A', beds: 1, baths: 1, sqft: 720, status: 'under-construction', targetSalePrice: 525000 },
+      { id: 'u2', name: 'Unit 1B', beds: 2, baths: 2, sqft: 1050, status: 'under-construction', targetSalePrice: 749000 },
+      { id: 'u3', name: 'Unit 2A', beds: 2, baths: 2, sqft: 1050, status: 'planned', targetSalePrice: 765000 },
+      { id: 'u4', name: 'Unit 2B', beds: 3, baths: 2, sqft: 1350, status: 'planned', targetSalePrice: 899000 },
+      { id: 'u5', name: 'Unit 3A', beds: 2, baths: 2, sqft: 1100, status: 'planned', targetSalePrice: 799000 },
+      { id: 'u6', name: 'Penthouse', beds: 3, baths: 3, sqft: 1650, status: 'planned', targetSalePrice: 1250000 },
+    ],
   },
 ]
 
@@ -234,6 +275,25 @@ export const useStore = create<DealVaultState>()(
         set((state) => ({
           deals: state.deals.map((d) =>
             d.id === dealId ? { ...d, photos: (d.photos || []).filter((_, i) => i !== index) } : d
+          ),
+        })),
+
+      addUnit: (dealId, unit) =>
+        set((state) => ({
+          deals: state.deals.map((d) =>
+            d.id === dealId ? { ...d, units: [...(d.units || []), { ...unit, id: Date.now().toString() + Math.random().toString(36).slice(2, 6) }] } : d
+          ),
+        })),
+      updateUnit: (dealId, unitId, updates) =>
+        set((state) => ({
+          deals: state.deals.map((d) =>
+            d.id === dealId ? { ...d, units: (d.units || []).map((u) => (u.id === unitId ? { ...u, ...updates } : u)) } : d
+          ),
+        })),
+      deleteUnit: (dealId, unitId) =>
+        set((state) => ({
+          deals: state.deals.map((d) =>
+            d.id === dealId ? { ...d, units: (d.units || []).filter((u) => u.id !== unitId) } : d
           ),
         })),
 
