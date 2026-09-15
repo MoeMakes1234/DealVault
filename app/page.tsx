@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { CheckCircle, TrendingUp, Users, FileText, BarChart3, Clock, Home as HomeIcon, DollarSign, ArrowRight } from 'lucide-react'
+import { CheckCircle, TrendingUp, Users, FileText, BarChart3, Clock, Home as HomeIcon, DollarSign, ArrowRight, Calculator } from 'lucide-react'
 import { useState } from 'react'
 
 export default function Home() {
@@ -36,25 +36,34 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="container-max py-24">
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <h1 className="section-title text-5xl mb-6">
-            Manage Your Real Estate Empire
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-            Professional project management, budgeting, and tracking for real estate developers and house flippers. 
-            Track profitability in real-time across all your projects.
-          </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Link href="/auth/signup" className="btn-primary text-lg px-8 py-4">
-              Get Started Free
-            </Link>
-            <a href="#features" className="btn-secondary text-lg px-8 py-4">
-              See Features
-            </a>
-          </div>
-          <p className="text-gray-500 mt-4">No credit card required • 14-day free trial</p>
+      <section className="relative overflow-hidden">
+        {/* Decorative gradient blobs */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-200 rounded-full blur-3xl opacity-30" />
+          <div className="absolute top-20 right-1/4 w-96 h-96 bg-indigo-200 rounded-full blur-3xl opacity-30" />
         </div>
+        <div className="container-max py-24">
+          <div className="max-w-3xl mx-auto text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+              <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+              Built for flippers &amp; developers
+            </div>
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Manage Your Real Estate <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Empire</span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+              Analyze deals, track budgets, manage contractors, and see real-time profitability across every project — all in one place.
+            </p>
+            <div className="flex gap-4 justify-center flex-wrap">
+              <Link href="/auth/signup" className="btn-primary text-lg px-8 py-4">
+                Get Started Free
+              </Link>
+              <a href="#features" className="btn-secondary text-lg px-8 py-4">
+                See Features
+              </a>
+            </div>
+            <p className="text-gray-500 mt-4">No credit card required • 14-day free trial</p>
+          </div>
 
         {/* Hero dashboard mockup */}
         <div className="rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 p-1.5 shadow-2xl max-w-5xl mx-auto animate-fade-in">
@@ -127,6 +136,24 @@ export default function Home() {
             </div>
           </div>
         </div>
+        </div>
+      </section>
+
+      {/* Stats band */}
+      <section className="bg-gradient-to-r from-blue-600 to-indigo-600 py-12">
+        <div className="container-max grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
+          {[
+            { stat: '$50M+', label: 'TAM opportunity' },
+            { stat: '100K+', label: 'US flippers' },
+            { stat: '6', label: 'tools in one' },
+            { stat: '14 days', label: 'free to try' },
+          ].map((s) => (
+            <div key={s.label}>
+              <p className="text-3xl md:text-4xl font-bold">{s.stat}</p>
+              <p className="text-blue-100 text-sm mt-1">{s.label}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Features Section */}
@@ -135,6 +162,11 @@ export default function Home() {
           <h2 className="section-title text-center mb-16">Everything You Need</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
+              {
+                icon: Calculator,
+                title: 'Property Analyzer',
+                desc: 'Run the 70% rule, ROI, cap rate, and financing on any property before you commit — then convert winners into deals.',
+              },
               {
                 icon: BarChart3,
                 title: 'Deal Pipeline',
@@ -301,6 +333,38 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-24 bg-gray-50 border-t border-gray-100">
+        <div className="container-max">
+          <h2 className="section-title text-center mb-4">Loved by operators</h2>
+          <p className="text-center text-gray-600 mb-12">See what real estate pros say about running their business on DealVault.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { quote: "I used to run five flips out of a mess of spreadsheets. Now I know my exact profit on every project at a glance.", name: 'Marcus T.', role: 'House Flipper, Atlanta' },
+              { quote: "The analyzer alone paid for itself. I passed on a deal that looked good but failed the 70% rule — dodged a bad one.", name: 'Priya S.', role: 'Investor, Dallas' },
+              { quote: "Finally something between a spreadsheet and Procore. My contractors, budgets, and docs are all in one place.", name: 'Danny R.', role: 'Small Developer, Chicago' },
+            ].map((t) => (
+              <div key={t.name} className="card">
+                <div className="flex gap-1 mb-3 text-amber-400">
+                  {'★★★★★'.split('').map((s, i) => <span key={i}>{s}</span>)}
+                </div>
+                <p className="text-gray-700 mb-4 leading-relaxed">"{t.quote}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white text-sm font-bold">
+                    {t.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900 text-sm">{t.name}</p>
+                    <p className="text-xs text-gray-500">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-xs text-gray-400 mt-8">Illustrative testimonials shown while we onboard our first customers.</p>
         </div>
       </section>
 

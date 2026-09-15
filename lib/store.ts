@@ -67,16 +67,37 @@ export interface BudgetItem {
   spent: number
 }
 
+export interface SavedAnalysis {
+  id: string
+  address: string
+  type: 'flip' | 'rental'
+  // flip fields
+  purchasePrice: number
+  rehabBudget: number
+  arv: number
+  // rental fields
+  monthlyRent?: number
+  monthlyExpenses?: number
+  downPayment?: number
+  dateAdded: string
+  converted?: boolean
+}
+
 interface DealVaultState {
   deals: Deal[]
   contractors: Contractor[]
   documents: DocumentItem[]
   tasks: TimelineTask[]
   budgetItems: BudgetItem[]
+  analyses: SavedAnalysis[]
 
   addDeal: (deal: Omit<Deal, 'id'>) => void
   updateDeal: (id: string, updates: Partial<Deal>) => void
   deleteDeal: (id: string) => void
+
+  addAnalysis: (a: Omit<SavedAnalysis, 'id'>) => void
+  deleteAnalysis: (id: string) => void
+  markAnalysisConverted: (id: string) => void
 
   addBudgetItem: (b: Omit<BudgetItem, 'id'>) => void
   updateBudgetItem: (id: string, updates: Partial<BudgetItem>) => void
@@ -162,6 +183,7 @@ export const useStore = create<DealVaultState>()(
       documents: initialDocuments,
       tasks: initialTasks,
       budgetItems: initialBudgetItems,
+      analyses: [],
 
       addDeal: (deal) =>
         set((state) => ({
@@ -176,6 +198,17 @@ export const useStore = create<DealVaultState>()(
           deals: state.deals.filter((d) => d.id !== id),
           budgetItems: state.budgetItems.filter((b) => b.dealId !== id),
           tasks: state.tasks.filter((t) => t.dealId !== id),
+        })),
+
+      addAnalysis: (a) =>
+        set((state) => ({
+          analyses: [...state.analyses, { ...a, id: Date.now().toString() }],
+        })),
+      deleteAnalysis: (id) =>
+        set((state) => ({ analyses: state.analyses.filter((a) => a.id !== id) })),
+      markAnalysisConverted: (id) =>
+        set((state) => ({
+          analyses: state.analyses.map((a) => (a.id === id ? { ...a, converted: true } : a)),
         })),
 
       addBudgetItem: (b) =>

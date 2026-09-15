@@ -14,11 +14,13 @@ import {
   Menu,
   X,
   Sparkles,
+  Calculator,
 } from 'lucide-react'
 import { useState } from 'react'
 
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+  { href: '/dashboard/analyzer', label: 'Analyzer', icon: Calculator },
   { href: '/dashboard/deals', label: 'Deals', icon: Building2 },
   { href: '/dashboard/contractors', label: 'Contractors', icon: Users },
   { href: '/dashboard/documents', label: 'Documents', icon: FileText },
@@ -33,7 +35,7 @@ export default function Sidebar() {
 
   const SidebarContent = (
     <>
-      <Link href="/" className="flex items-center gap-3 px-6 py-5 border-b border-gray-800 hover:bg-gray-900 transition-colors">
+      <Link href="/dashboard" className="flex items-center gap-3 px-6 py-5 border-b border-gray-800 hover:bg-gray-900 transition-colors">
         <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
           <Home className="w-5 h-5 text-white" />
         </div>
@@ -81,7 +83,7 @@ export default function Sidebar() {
     <>
       {/* Mobile top bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0a0e27] flex items-center justify-between px-4 py-3 border-b border-gray-800">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <Home className="w-4 h-4 text-white" />
           </div>

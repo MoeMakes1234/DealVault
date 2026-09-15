@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Plus, DollarSign, TrendingUp, BarChart3, ArrowRight, Users, FileText, Clock } from 'lucide-react'
+import { Plus, DollarSign, TrendingUp, BarChart3, ArrowRight, Users, FileText, Clock, Calculator } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { useStore } from '@/lib/store'
 
@@ -128,6 +128,22 @@ export default function DashboardOverview() {
           </div>
         </div>
       </div>
+
+      {/* Analyzer promo */}
+      <Link href="/dashboard/analyzer" className="block mb-8 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white hover:shadow-lg transition-shadow group">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <Calculator className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="font-bold text-lg">Analyze a property before you buy</h3>
+              <p className="text-blue-100 text-sm">Run the 70% rule, ROI, cap rate & financing — then convert winners into deals.</p>
+            </div>
+          </div>
+          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+        </div>
+      </Link>
 
       {/* Quick links to other sections */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
