@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Plus, Trash2, Edit2, X, Search, ArrowUpDown, Building2, ChevronRight } from 'lucide-react'
 import { useStore, Deal } from '@/lib/store'
 import { useToast } from '@/lib/toast'
+import { fmtCompact } from '@/lib/format'
 
 type SortKey = 'newest' | 'profit' | 'budget-usage' | 'address'
 
@@ -360,12 +361,12 @@ export default function DealsPage() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Acquisition</p>
-                    <p className="font-semibold text-gray-900">${(deal.acquisitionPrice / 1000).toFixed(0)}K</p>
+                    <p className="font-semibold text-gray-900">{fmtCompact(deal.acquisitionPrice)}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Spent / Budget</p>
                     <p className="font-semibold text-gray-900">
-                      ${(deal.spent / 1000).toFixed(0)}K / ${(deal.budget / 1000).toFixed(0)}K
+                      {fmtCompact(deal.spent)} / {fmtCompact(deal.budget)}
                     </p>
                     <div className="bg-gray-200 rounded-full h-2 mt-2 overflow-hidden w-32">
                       <div
@@ -377,10 +378,10 @@ export default function DealsPage() {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Expected Profit</p>
                     <p className={`font-semibold ${deal.expectedProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      ${(deal.expectedProfit / 1000).toFixed(0)}K
+                      {fmtCompact(deal.expectedProfit)}
                     </p>
                     {deal.saleTarget && (
-                      <p className="text-xs text-gray-400 mt-1">Target sale ${(deal.saleTarget / 1000).toFixed(0)}K</p>
+                      <p className="text-xs text-gray-400 mt-1">Target sale {fmtCompact(deal.saleTarget)}</p>
                     )}
                   </div>
                   <div className="flex items-center">

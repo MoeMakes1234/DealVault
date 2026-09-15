@@ -14,6 +14,22 @@ export interface Unit {
   targetSalePrice?: number
 }
 
+export type CapitalType = 'equity' | 'debt'
+
+export interface Investor {
+  id: string
+  dealId: string
+  name: string
+  type: CapitalType
+  amount: number
+  // equity fields
+  ownershipPct?: number
+  preferredReturn?: number
+  // debt fields
+  interestRate?: number
+  lenderType?: string
+}
+
 export interface Deal {
   id: string
   address: string
@@ -114,9 +130,14 @@ interface DealVaultState {
   tasks: TimelineTask[]
   budgetItems: BudgetItem[]
   analyses: SavedAnalysis[]
+  investors: Investor[]
   settings: Settings
 
   updateSettings: (updates: Partial<Settings>) => void
+
+  addInvestor: (i: Omit<Investor, 'id'>) => void
+  updateInvestor: (id: string, updates: Partial<Investor>) => void
+  deleteInvestor: (id: string) => void
 
   addDeal: (deal: Omit<Deal, 'id'>) => void
   updateDeal: (id: string, updates: Partial<Deal>) => void
@@ -230,6 +251,13 @@ const initialBudgetItems: BudgetItem[] = [
   { id: 'b9', dealId: '2', category: 'contingency', label: 'Contingency', budgeted: 10000, spent: 7500 },
 ]
 
+const initialInvestors: Investor[] = [
+  { id: 'i1', dealId: '3', name: 'You (Sponsor)', type: 'equity', amount: 400000, ownershipPct: 30 },
+  { id: 'i2', dealId: '3', name: 'Riverside Capital Partners', type: 'equity', amount: 800000, ownershipPct: 60, preferredReturn: 8 },
+  { id: 'i3', dealId: '3', name: 'Private LP — J. Alvarez', type: 'equity', amount: 133000, ownershipPct: 10, preferredReturn: 8 },
+  { id: 'i4', dealId: '3', name: 'First Metro Construction Loan', type: 'debt', amount: 2400000, interestRate: 9.5, lenderType: 'Construction Loan' },
+]
+
 export const useStore = create<DealVaultState>()(
   persist(
     (set) => ({
@@ -239,6 +267,7 @@ export const useStore = create<DealVaultState>()(
       tasks: initialTasks,
       budgetItems: initialBudgetItems,
       analyses: [],
+      investors: initialInvestors,
       settings: {
         companyName: '',
         fullName: '',
@@ -249,6 +278,13 @@ export const useStore = create<DealVaultState>()(
 
       updateSettings: (updates) =>
         set((state) => ({ settings: { ...state.settings, ...updates } })),
+
+      addInvestor: (i) =>
+        set((state) => ({ investors: [...state.investors, { ...i, id: Date.now().toString() + Math.random().toString(36).slice(2, 6) }] })),
+      updateInvestor: (id, updates) =>
+        set((state) => ({ investors: state.investors.map((inv) => (inv.id === id ? { ...inv, ...updates } : inv)) })),
+      deleteInvestor: (id) =>
+        set((state) => ({ investors: state.investors.filter((inv) => inv.id !== id) })),
 
       addDeal: (deal) =>
         set((state) => ({

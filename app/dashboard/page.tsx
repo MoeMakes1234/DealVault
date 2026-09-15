@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Plus, DollarSign, TrendingUp, BarChart3, ArrowRight, Users, FileText, Clock, Calculator } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from 'recharts'
 import { useStore } from '@/lib/store'
+import { fmtCompact } from '@/lib/format'
 
 export default function DashboardOverview() {
   const deals = useStore((s) => s.deals)
@@ -57,7 +58,7 @@ export default function DashboardOverview() {
             <span className="text-gray-600 font-medium text-sm">Total Invested</span>
             <DollarSign className="w-5 h-5 text-blue-600" />
           </div>
-          <p className="text-3xl font-bold">${(totalInvested / 1000).toFixed(0)}K</p>
+          <p className="text-3xl font-bold">{fmtCompact(totalInvested)}</p>
           <p className="text-sm text-gray-500 mt-2">{deals.length} total projects</p>
         </div>
 
@@ -66,7 +67,7 @@ export default function DashboardOverview() {
             <span className="text-gray-600 font-medium text-sm">Total Spent</span>
             <TrendingUp className="w-5 h-5 text-orange-600" />
           </div>
-          <p className="text-3xl font-bold">${(totalSpent / 1000).toFixed(0)}K</p>
+          <p className="text-3xl font-bold">{fmtCompact(totalSpent)}</p>
           <p className="text-sm text-gray-500 mt-2">Across all projects</p>
         </div>
 
@@ -75,7 +76,7 @@ export default function DashboardOverview() {
             <span className="text-gray-600 font-medium text-sm">Expected Profit</span>
             <TrendingUp className="w-5 h-5 text-green-600" />
           </div>
-          <p className="text-3xl font-bold">${(totalProfit / 1000).toFixed(0)}K</p>
+          <p className="text-3xl font-bold">{fmtCompact(totalProfit)}</p>
           <p className="text-sm text-gray-500 mt-2">Portfolio total</p>
         </div>
 
@@ -98,7 +99,7 @@ export default function DashboardOverview() {
             <AreaChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} />
-              <YAxis stroke="#9ca3af" fontSize={12} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+              <YAxis stroke="#9ca3af" fontSize={12} tickFormatter={(v) => fmtCompact(v)} />
               <Tooltip
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
                 formatter={(v: number) => `$${v.toLocaleString()}`}
@@ -149,7 +150,7 @@ export default function DashboardOverview() {
             <BarChart data={dealChartData} barGap={4}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
               <XAxis dataKey="name" stroke="#9ca3af" fontSize={12} />
-              <YAxis stroke="#9ca3af" fontSize={12} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+              <YAxis stroke="#9ca3af" fontSize={12} tickFormatter={(v) => fmtCompact(v)} />
               <Tooltip
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
                 formatter={(v: number) => `$${v.toLocaleString()}`}
@@ -239,11 +240,11 @@ export default function DashboardOverview() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-600 mb-1">Acquisition</p>
-                  <p className="font-semibold text-gray-900">${(deal.acquisitionPrice / 1000).toFixed(0)}K</p>
+                  <p className="font-semibold text-gray-900">{fmtCompact(deal.acquisitionPrice)}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-600 mb-1">Spent / Budget</p>
-                  <p className="font-semibold text-gray-900">${(deal.spent / 1000).toFixed(0)}K / ${(deal.budget / 1000).toFixed(0)}K</p>
+                  <p className="font-semibold text-gray-900">{fmtCompact(deal.spent)} / {fmtCompact(deal.budget)}</p>
                   <div className="bg-gray-200 rounded-full h-2 mt-2 overflow-hidden">
                     <div
                       className={`h-full transition-all ${deal.spent > deal.budget ? 'bg-red-500' : 'bg-green-500'}`}
@@ -253,7 +254,7 @@ export default function DashboardOverview() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-600 mb-1">Expected Profit</p>
-                  <p className="font-semibold text-green-600">${(deal.expectedProfit / 1000).toFixed(0)}K</p>
+                  <p className="font-semibold text-green-600">{fmtCompact(deal.expectedProfit)}</p>
                 </div>
                 <div className="flex items-center">
                   <span

@@ -5,10 +5,11 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft, Plus, Trash2, X, MapPin, Calendar, TrendingUp, Users, FileText, Building2,
-  Clock, DollarSign, AlertTriangle, Check, Circle, Clock3, Image as ImageIcon, Upload,
+  Clock, DollarSign, AlertTriangle, Check, Circle, Clock3, Image as ImageIcon, Upload, Layers,
 } from 'lucide-react'
-import { useStore, BudgetCategory, TimelineTask, Unit } from '@/lib/store'
+import { useStore, BudgetCategory, TimelineTask, Unit, Investor } from '@/lib/store'
 import { useToast } from '@/lib/toast'
+import { fmtCompact } from '@/lib/format'
 
 const categoryLabels: Record<BudgetCategory, string> = {
   acquisition: 'Acquisition', demo: 'Demolition', framing: 'Framing', electrical: 'Electrical',
@@ -42,11 +43,16 @@ export default function DealDetailPage() {
   const addUnit = useStore((s) => s.addUnit)
   const updateUnit = useStore((s) => s.updateUnit)
   const deleteUnit = useStore((s) => s.deleteUnit)
+  const investors = useStore((s) => s.investors.filter((i) => i.dealId === dealId))
+  const addInvestor = useStore((s) => s.addInvestor)
+  const deleteInvestor = useStore((s) => s.deleteInvestor)
 
   const [showBudgetForm, setShowBudgetForm] = useState(false)
   const [bForm, setBForm] = useState({ category: 'finishes' as BudgetCategory, label: '', budgeted: '', spent: '' })
   const [showUnitForm, setShowUnitForm] = useState(false)
   const [uForm, setUForm] = useState({ name: '', beds: '', baths: '', sqft: '', status: 'planned' as Unit['status'], targetRent: '', targetSalePrice: '' })
+  const [showInvestorForm, setShowInvestorForm] = useState(false)
+  const [iForm, setIForm] = useState({ name: '', type: 'equity' as Investor['type'], amount: '', ownershipPct: '', preferredReturn: '', interestRate: '', lenderType: '' })
 
   if (!deal) {
     return (
@@ -70,6 +76,10 @@ export default function DealDetailPage() {
   const totalSqft = units.reduce((s, u) => s + u.sqft, 0)
   const unitsSold = units.filter((u) => u.status === 'sold').length
   const unitsLeased = units.filter((u) => u.status === 'leased').length
+
+  const totalEquity = investors.filter((i) => i.type === 'equity').reduce((s, i) => s + i.amount, 0)
+  const totalDebt = investors.filter((i) => i.type === 'debt').reduce((s, i) => s + i.amount, 0)
+  const totalCapital = totalEquity + totalDebt
 
   const handleAddBudget = (e: React.FormEvent) => {
     e.preventDefault()
@@ -99,6 +109,23 @@ export default function DealDetailPage() {
     setUForm({ name: '', beds: '', baths: '', sqft: '', status: 'planned', targetRent: '', targetSalePrice: '' })
     setShowUnitForm(false)
     toast('Unit added')
+  }
+
+  const handleAddInvestor = (e: React.FormEvent) => {
+    e.preventDefault()
+    addInvestor({
+      dealId,
+      name: iForm.name,
+      type: iForm.type,
+      amount: Number(iForm.amount) || 0,
+      ownershipPct: iForm.ownershipPct ? Number(iForm.ownershipPct) : undefined,
+      preferredReturn: iForm.preferredReturn ? Number(iForm.preferredReturn) : undefined,
+      interestRate: iForm.interestRate ? Number(iForm.interestRate) : undefined,
+      lenderType: iForm.lenderType || undefined,
+    })
+    setIForm({ name: '', type: 'equity', amount: '', ownershipPct: '', preferredReturn: '', interestRate: '', lenderType: '' })
+    setShowInvestorForm(false)
+    toast('Added to capital stack')
   }
 
   const cycleTask = (task: TimelineTask) => {
@@ -163,20 +190,20 @@ export default function DealDetailPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="card">
           <div className="flex items-center gap-2 text-gray-500 text-sm mb-1"><DollarSign className="w-4 h-4" /> Acquisition</div>
-          <p className="text-2xl font-bold">${(deal.acquisitionPrice / 1000).toFixed(0)}K</p>
+          <p className="text-2xl font-bold">{fmtCompact(deal.acquisitionPrice)}</p>
         </div>
         <div className="card">
           <div className="flex items-center gap-2 text-gray-500 text-sm mb-1"><TrendingUp className="w-4 h-4" /> All-In Cost</div>
-          <p className="text-2xl font-bold">${(allIn / 1000).toFixed(0)}K</p>
+          <p className="text-2xl font-bold">{fmtCompact(allIn)}</p>
         </div>
         <div className="card">
           <div className="flex items-center gap-2 text-gray-500 text-sm mb-1"><MapPin className="w-4 h-4" /> Target Sale</div>
-          <p className="text-2xl font-bold">{deal.saleTarget ? `$${(deal.saleTarget / 1000).toFixed(0)}K` : '—'}</p>
+          <p className="text-2xl font-bold">{deal.saleTarget ? fmtCompact(deal.saleTarget) : '—'}</p>
         </div>
         <div className="card">
           <div className="flex items-center gap-2 text-gray-500 text-sm mb-1"><TrendingUp className="w-4 h-4" /> Projected Profit</div>
           <p className={`text-2xl font-bold ${projectedProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            ${(projectedProfit / 1000).toFixed(0)}K
+            {fmtCompact(projectedProfit)}
           </p>
         </div>
       </div>
@@ -207,13 +234,13 @@ export default function DealDetailPage() {
                     {totalUnitRent > 0 && (
                       <div className="bg-gray-50 rounded-lg p-3">
                         <p className="text-xs text-gray-500">Gross Rent/mo</p>
-                        <p className="text-xl font-bold text-green-600">${(totalUnitRent / 1000).toFixed(1)}K</p>
+                        <p className="text-xl font-bold text-green-600">{fmtCompact(totalUnitRent)}</p>
                       </div>
                     )}
                     {totalUnitSalePrice > 0 && (
                       <div className="bg-gray-50 rounded-lg p-3">
                         <p className="text-xs text-gray-500">Total Sellout</p>
-                        <p className="text-xl font-bold text-green-600">${(totalUnitSalePrice / 1000000).toFixed(2)}M</p>
+                        <p className="text-xl font-bold text-green-600">{fmtCompact(totalUnitSalePrice)}</p>
                       </div>
                     )}
                     {(unitsSold > 0 || unitsLeased > 0) && (
@@ -277,6 +304,73 @@ export default function DealDetailPage() {
               ) : (
                 <div className="text-center py-8 text-gray-400 text-sm">
                   No units yet. Add each apartment, townhome, or unit to track status, rent, and sellout.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Capital Stack - only for development project types */}
+          {isDevelopment && (
+            <div className="card">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-lg font-bold flex items-center gap-2"><Layers className="w-5 h-5 text-emerald-500" /> Capital Stack</h3>
+                <button onClick={() => setShowInvestorForm(true)} className="text-blue-600 text-sm font-medium flex items-center gap-1 hover:text-blue-700">
+                  <Plus className="w-4 h-4" /> Add Source
+                </button>
+              </div>
+
+              {investors.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-3 gap-3 my-4">
+                    <div className="bg-emerald-50 rounded-lg p-3">
+                      <p className="text-xs text-emerald-700">Total Equity</p>
+                      <p className="text-lg font-bold text-emerald-700">{fmtCompact(totalEquity)}</p>
+                    </div>
+                    <div className="bg-amber-50 rounded-lg p-3">
+                      <p className="text-xs text-amber-700">Total Debt</p>
+                      <p className="text-lg font-bold text-amber-700">{fmtCompact(totalDebt)}</p>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-xs text-gray-500">Total Capital</p>
+                      <p className="text-lg font-bold">{fmtCompact(totalCapital)}</p>
+                    </div>
+                  </div>
+
+                  {/* Stacked capital bar */}
+                  {totalCapital > 0 && (
+                    <div className="flex h-3 rounded-full overflow-hidden mb-4">
+                      <div className="bg-emerald-500" style={{ width: `${(totalEquity / totalCapital) * 100}%` }} title="Equity" />
+                      <div className="bg-amber-500" style={{ width: `${(totalDebt / totalCapital) * 100}%` }} title="Debt" />
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    {investors.map((inv) => (
+                      <div key={inv.id} className="flex items-center justify-between border border-gray-100 rounded-lg px-3 py-2.5 group">
+                        <div className="flex items-center gap-3">
+                          <span className={`w-2 h-2 rounded-full ${inv.type === 'equity' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{inv.name}</p>
+                            <p className="text-xs text-gray-500 capitalize">
+                              {inv.type === 'equity'
+                                ? `Equity${inv.ownershipPct ? ` · ${inv.ownershipPct}% ownership` : ''}${inv.preferredReturn ? ` · ${inv.preferredReturn}% pref` : ''}`
+                                : `${inv.lenderType || 'Debt'}${inv.interestRate ? ` · ${inv.interestRate}% interest` : ''}`}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-semibold">{fmtCompact(inv.amount)}</span>
+                          <button onClick={() => { deleteInvestor(inv.id); toast('Removed from capital stack', 'info') }} className="text-gray-300 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-8 text-gray-400 text-sm">
+                  No capital sources yet. Add your equity, partner equity, and construction loans to model the stack.
                 </div>
               )}
             </div>
@@ -381,7 +475,7 @@ export default function DealDetailPage() {
                       <p className="text-sm font-medium text-gray-900">{c.name}</p>
                       <p className="text-xs text-gray-500">{c.trade}</p>
                     </div>
-                    <span className="text-sm font-semibold text-gray-700">${(c.totalPaid / 1000).toFixed(1)}K</span>
+                    <span className="text-sm font-semibold text-gray-700">{fmtCompact(c.totalPaid)}</span>
                   </div>
                 ))}
               </div>
@@ -443,6 +537,65 @@ export default function DealDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Add investor / capital source modal */}
+      {showInvestorForm && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50" onClick={() => setShowInvestorForm(false)}>
+          <form onSubmit={handleAddInvestor} onClick={(e) => e.stopPropagation()} className="bg-white rounded-xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-bold">Add Capital Source</h3>
+              <button type="button" onClick={() => setShowInvestorForm(false)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <button type="button" onClick={() => setIForm({ ...iForm, type: 'equity' })}
+                  className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${iForm.type === 'equity' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white text-gray-600 border-gray-200'}`}>
+                  Equity
+                </button>
+                <button type="button" onClick={() => setIForm({ ...iForm, type: 'debt' })}
+                  className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${iForm.type === 'debt' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-gray-600 border-gray-200'}`}>
+                  Debt
+                </button>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Name</label>
+                <input required value={iForm.name} onChange={(e) => setIForm({ ...iForm, name: e.target.value })} placeholder={iForm.type === 'equity' ? 'e.g. Riverside Capital / You' : 'e.g. First Metro Construction Loan'} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Amount ($)</label>
+                <input type="number" required value={iForm.amount} onChange={(e) => setIForm({ ...iForm, amount: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+              </div>
+              {iForm.type === 'equity' ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Ownership (%)</label>
+                    <input type="number" value={iForm.ownershipPct} onChange={(e) => setIForm({ ...iForm, ownershipPct: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Pref Return (%)</label>
+                    <input type="number" step="0.1" value={iForm.preferredReturn} onChange={(e) => setIForm({ ...iForm, preferredReturn: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Loan Type</label>
+                    <input value={iForm.lenderType} onChange={(e) => setIForm({ ...iForm, lenderType: e.target.value })} placeholder="Construction Loan" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Interest (%)</label>
+                    <input type="number" step="0.1" value={iForm.interestRate} onChange={(e) => setIForm({ ...iForm, interestRate: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button type="button" onClick={() => setShowInvestorForm(false)} className="btn-secondary">Cancel</button>
+              <button type="submit" className="btn-primary">Add</button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* Add unit modal */}
       {showUnitForm && (

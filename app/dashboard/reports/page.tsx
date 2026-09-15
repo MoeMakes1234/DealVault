@@ -2,6 +2,7 @@
 
 import { Download } from 'lucide-react'
 import { useStore } from '@/lib/store'
+import { fmtCompact } from '@/lib/format'
 
 export default function ReportsPage() {
   const deals = useStore((s) => s.deals)
@@ -55,17 +56,17 @@ export default function ReportsPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="card">
           <p className="text-sm text-gray-600 mb-1">Total Invested</p>
-          <p className="text-2xl font-bold">${(totalInvested / 1000).toFixed(0)}K</p>
+          <p className="text-2xl font-bold">{fmtCompact(totalInvested)}</p>
         </div>
         <div className="card">
           <p className="text-sm text-gray-600 mb-1">Budget vs Spent</p>
           <p className="text-2xl font-bold">
-            ${(totalSpent / 1000).toFixed(0)}K <span className="text-sm text-gray-400 font-normal">/ ${(totalBudget / 1000).toFixed(0)}K</span>
+            {fmtCompact(totalSpent)} <span className="text-sm text-gray-400 font-normal">/ {fmtCompact(totalBudget)}</span>
           </p>
         </div>
         <div className="card">
           <p className="text-sm text-gray-600 mb-1">Expected Profit</p>
-          <p className="text-2xl font-bold text-green-600">${(totalProfit / 1000).toFixed(0)}K</p>
+          <p className="text-2xl font-bold text-green-600">{fmtCompact(totalProfit)}</p>
         </div>
         <div className="card">
           <p className="text-sm text-gray-600 mb-1">Over-Budget Deals</p>
