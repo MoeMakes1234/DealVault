@@ -13,6 +13,15 @@ export interface Deal {
   startDate?: string
   targetCompletionDate?: string
   notes?: string
+  photos?: string[]
+}
+
+export interface Settings {
+  companyName: string
+  fullName: string
+  email: string
+  currency: string
+  defaultRehabBuffer: number
 }
 
 export interface Contractor {
@@ -90,10 +99,15 @@ interface DealVaultState {
   tasks: TimelineTask[]
   budgetItems: BudgetItem[]
   analyses: SavedAnalysis[]
+  settings: Settings
+
+  updateSettings: (updates: Partial<Settings>) => void
 
   addDeal: (deal: Omit<Deal, 'id'>) => void
   updateDeal: (id: string, updates: Partial<Deal>) => void
   deleteDeal: (id: string) => void
+  addDealPhoto: (dealId: string, dataUrl: string) => void
+  removeDealPhoto: (dealId: string, index: number) => void
 
   addAnalysis: (a: Omit<SavedAnalysis, 'id'>) => void
   deleteAnalysis: (id: string) => void
@@ -184,6 +198,16 @@ export const useStore = create<DealVaultState>()(
       tasks: initialTasks,
       budgetItems: initialBudgetItems,
       analyses: [],
+      settings: {
+        companyName: '',
+        fullName: '',
+        email: '',
+        currency: 'USD',
+        defaultRehabBuffer: 15,
+      },
+
+      updateSettings: (updates) =>
+        set((state) => ({ settings: { ...state.settings, ...updates } })),
 
       addDeal: (deal) =>
         set((state) => ({
@@ -198,6 +222,19 @@ export const useStore = create<DealVaultState>()(
           deals: state.deals.filter((d) => d.id !== id),
           budgetItems: state.budgetItems.filter((b) => b.dealId !== id),
           tasks: state.tasks.filter((t) => t.dealId !== id),
+        })),
+
+      addDealPhoto: (dealId, dataUrl) =>
+        set((state) => ({
+          deals: state.deals.map((d) =>
+            d.id === dealId ? { ...d, photos: [...(d.photos || []), dataUrl] } : d
+          ),
+        })),
+      removeDealPhoto: (dealId, index) =>
+        set((state) => ({
+          deals: state.deals.map((d) =>
+            d.id === dealId ? { ...d, photos: (d.photos || []).filter((_, i) => i !== index) } : d
+          ),
         })),
 
       addAnalysis: (a) =>

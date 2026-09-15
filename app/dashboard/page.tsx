@@ -3,34 +3,43 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Plus, DollarSign, TrendingUp, BarChart3, ArrowRight, Users, FileText, Clock, Calculator } from 'lucide-react'
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from 'recharts'
 import { useStore } from '@/lib/store'
 
 export default function DashboardOverview() {
   const deals = useStore((s) => s.deals)
   const contractors = useStore((s) => s.contractors)
   const documents = useStore((s) => s.documents)
+  const settings = useStore((s) => s.settings)
+  const firstName = settings.fullName ? settings.fullName.split(' ')[0] : ''
 
   const totalInvested = deals.reduce((sum, d) => sum + d.acquisitionPrice, 0)
   const totalSpent = deals.reduce((sum, d) => sum + d.spent, 0)
   const totalProfit = deals.reduce((sum, d) => sum + d.expectedProfit, 0)
   const activeDeals = deals.filter((d) => d.status === 'in-progress').length
 
-  const chartData = [
-    { month: 'Jan', profit: 15000 },
-    { month: 'Feb', profit: 32000 },
-    { month: 'Mar', profit: 48000 },
-    { month: 'Apr', profit: 62000 },
-    { month: 'May', profit: 85000 },
-    { month: 'Jun', profit: 120000 },
-  ]
+  // Real per-deal budget vs spent for the bar chart
+  const dealChartData = deals.map((d) => ({
+    name: d.address.split(',')[0].slice(0, 14),
+    Budget: d.budget,
+    Spent: d.spent,
+  }))
+
+  // Cumulative expected profit across deals (real data) for the trend area
+  const chartData = deals.length
+    ? deals.reduce((acc: { month: string; profit: number }[], d, i) => {
+        const prev = i > 0 ? acc[i - 1].profit : 0
+        acc.push({ month: d.address.split(',')[0].slice(0, 10), profit: prev + d.expectedProfit })
+        return acc
+      }, [])
+    : [{ month: 'No deals', profit: 0 }]
 
   return (
     <div className="container-max py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Overview</h1>
-          <p className="text-gray-500 text-sm mt-1">Welcome back — here's how your portfolio is doing.</p>
+          <h1 className="text-2xl font-bold text-gray-900">{firstName ? `Welcome back, ${firstName}` : 'Overview'}</h1>
+          <p className="text-gray-500 text-sm mt-1">Here's how your portfolio is doing.</p>
         </div>
         <Link
           href="/dashboard/deals"
@@ -83,14 +92,16 @@ export default function DashboardOverview() {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="lg:col-span-2 card">
-          <h3 className="text-lg font-bold mb-6">Portfolio Performance</h3>
-          <ResponsiveContainer width="100%" height={280}>
+          <h3 className="text-lg font-bold mb-1">Cumulative Expected Profit</h3>
+          <p className="text-sm text-gray-500 mb-6">Built from your actual deals</p>
+          <ResponsiveContainer width="100%" height={240}>
             <AreaChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="month" stroke="#9ca3af" />
-              <YAxis stroke="#9ca3af" />
+              <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} />
+              <YAxis stroke="#9ca3af" fontSize={12} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
               <Tooltip
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                formatter={(v: number) => `$${v.toLocaleString()}`}
               />
               <Area type="monotone" dataKey="profit" stroke="#0066cc" fill="#0066cc" fillOpacity={0.1} />
             </AreaChart>
@@ -129,6 +140,28 @@ export default function DashboardOverview() {
         </div>
       </div>
 
+      {/* Budget vs Spent bar chart - real data */}
+      {deals.length > 0 && (
+        <div className="card mb-8">
+          <h3 className="text-lg font-bold mb-1">Budget vs. Spent by Deal</h3>
+          <p className="text-sm text-gray-500 mb-6">Track where you stand against budget on each project</p>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={dealChartData} barGap={4}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+              <XAxis dataKey="name" stroke="#9ca3af" fontSize={12} />
+              <YAxis stroke="#9ca3af" fontSize={12} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                formatter={(v: number) => `$${v.toLocaleString()}`}
+              />
+              <Legend />
+              <Bar dataKey="Budget" fill="#93c5fd" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Spent" fill="#2563eb" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
       {/* Analyzer promo */}
       <Link href="/dashboard/analyzer" className="block mb-8 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white hover:shadow-lg transition-shadow group">
         <div className="flex items-center justify-between">
@@ -138,7 +171,7 @@ export default function DashboardOverview() {
             </div>
             <div>
               <h3 className="font-bold text-lg">Analyze a property before you buy</h3>
-              <p className="text-blue-100 text-sm">Run the 70% rule, ROI, cap rate & financing — then convert winners into deals.</p>
+              <p className="text-blue-100 text-sm">Check the numbers, ROI, cap rate & financing — then convert winners into deals.</p>
             </div>
           </div>
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -192,6 +225,11 @@ export default function DashboardOverview() {
         </div>
 
         <div className="space-y-4">
+          {deals.length === 0 && (
+            <div className="text-center py-8 text-gray-400 text-sm">
+              No deals yet. Head to the Analyzer to evaluate a property, or add one directly on the Deals page.
+            </div>
+          )}
           {deals.slice(0, 3).map((deal) => (
             <div key={deal.id} className="border border-gray-200 rounded-lg p-4">
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">

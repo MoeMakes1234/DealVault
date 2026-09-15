@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft, Plus, Trash2, X, MapPin, Calendar, TrendingUp, Users, FileText,
-  Clock, DollarSign, AlertTriangle, Check, Circle, Clock3,
+  Clock, DollarSign, AlertTriangle, Check, Circle, Clock3, Image as ImageIcon, Upload,
 } from 'lucide-react'
 import { useStore, BudgetCategory, TimelineTask } from '@/lib/store'
 import { useToast } from '@/lib/toast'
@@ -37,6 +37,8 @@ export default function DealDetailPage() {
   const addBudgetItem = useStore((s) => s.addBudgetItem)
   const deleteBudgetItem = useStore((s) => s.deleteBudgetItem)
   const updateTask = useStore((s) => s.updateTask)
+  const addDealPhoto = useStore((s) => s.addDealPhoto)
+  const removeDealPhoto = useStore((s) => s.removeDealPhoto)
 
   const [showBudgetForm, setShowBudgetForm] = useState(false)
   const [bForm, setBForm] = useState({ category: 'finishes' as BudgetCategory, label: '', budgeted: '', spent: '' })
@@ -73,6 +75,22 @@ export default function DealDetailPage() {
   const cycleTask = (task: TimelineTask) => {
     const order: TimelineTask['status'][] = ['pending', 'in-progress', 'done']
     updateTask(task.id, { status: order[(order.indexOf(task.status) + 1) % order.length] })
+  }
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) {
+      toast('Image too large (max 2MB)', 'error')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      addDealPhoto(dealId, reader.result as string)
+      toast('Photo added')
+    }
+    reader.readAsDataURL(file)
+    e.target.value = ''
   }
 
   return (
@@ -237,6 +255,38 @@ export default function DealDetailPage() {
               </div>
             )}
             <Link href="/dashboard/contractors" className="text-blue-600 text-xs font-medium mt-3 inline-block hover:text-blue-700">Manage contractors →</Link>
+          </div>
+
+          <div className="card">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-bold flex items-center gap-2"><ImageIcon className="w-4 h-4 text-gray-400" /> Photos</h3>
+              <label className="text-blue-600 text-xs font-medium cursor-pointer hover:text-blue-700 flex items-center gap-1">
+                <Upload className="w-3.5 h-3.5" /> Add
+                <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
+              </label>
+            </div>
+            {(!deal.photos || deal.photos.length === 0) ? (
+              <label className="block border-2 border-dashed border-gray-200 rounded-lg py-8 text-center cursor-pointer hover:border-blue-300 hover:bg-blue-50/50 transition-colors">
+                <ImageIcon className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-xs text-gray-400">Upload before/after photos</p>
+                <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
+              </label>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                {deal.photos.map((photo, i) => (
+                  <div key={i} className="relative group aspect-square rounded-lg overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={photo} alt={`Deal photo ${i + 1}`} className="w-full h-full object-cover" />
+                    <button
+                      onClick={() => { removeDealPhoto(dealId, i); toast('Photo removed', 'info') }}
+                      className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="card">

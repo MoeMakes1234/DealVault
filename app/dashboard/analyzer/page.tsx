@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Calculator, TrendingUp, Home, DollarSign, Check, X, Trash2, ArrowRight, Percent, Save } from 'lucide-react'
 import { useStore } from '@/lib/store'
@@ -21,6 +21,16 @@ export default function AnalyzerPage() {
 
   // ---- Flip Analyzer state ----
   const [flip, setFlip] = useState({ address: '', purchasePrice: '', rehabBudget: '', arv: '', holdingCosts: '', sellingCosts: '' })
+
+  // Pick up a rehab total handed off from the Rehab Estimator
+  useEffect(() => {
+    const handoff = sessionStorage.getItem('dealvault-rehab-total')
+    if (handoff) {
+      setFlip((f) => ({ ...f, rehabBudget: handoff }))
+      sessionStorage.removeItem('dealvault-rehab-total')
+      setTab('flip')
+    }
+  }, [])
   const fp = Number(flip.purchasePrice) || 0
   const fr = Number(flip.rehabBudget) || 0
   const farv = Number(flip.arv) || 0
@@ -138,7 +148,9 @@ export default function AnalyzerPage() {
                   <input type="number" value={flip.purchasePrice} onChange={(e) => setFlip({ ...flip, purchasePrice: e.target.value })} className={inputCls} />
                 </div>
                 <div>
-                  <label className={labelCls}>Rehab Budget ($)</label>
+                  <label className={labelCls}>
+                    Rehab Budget ($) · <a href="/dashboard/rehab" className="text-blue-600 hover:underline">estimate it</a>
+                  </label>
                   <input type="number" value={flip.rehabBudget} onChange={(e) => setFlip({ ...flip, rehabBudget: e.target.value })} className={inputCls} />
                 </div>
               </div>
