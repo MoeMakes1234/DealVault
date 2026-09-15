@@ -4,6 +4,40 @@ import Link from 'next/link'
 import { CheckCircle, TrendingUp, Users, FileText, BarChart3, Clock, Home as HomeIcon, DollarSign, ArrowRight, Calculator } from 'lucide-react'
 import { useState } from 'react'
 
+const testimonials = [
+  { quote: "I used to run five flips out of a mess of spreadsheets. Now I know my exact profit on every project at a glance.", name: 'Marcus T.', role: 'House Flipper, Atlanta' },
+  { quote: "The analyzer alone paid for itself. I passed on a deal that looked great on paper but the numbers said no — dodged a bad one.", name: 'Priya S.', role: 'Investor, Dallas' },
+  { quote: "Finally something between a spreadsheet and Procore. My contractors, budgets, and docs are all in one place.", name: 'Danny R.', role: 'Small Developer, Chicago' },
+  { quote: "The budget line-items caught me going over on electrical before it blew the whole project. Saved me thousands.", name: 'Alicia M.', role: 'Flipper, Phoenix' },
+]
+
+const testimonials2 = [
+  { quote: "Converting an analyzed property straight into a tracked deal is such a smooth workflow. It just makes sense.", name: 'Reggie B.', role: 'Wholesaler, Kansas City' },
+  { quote: "I manage 12 rentals and DealVault finally gave me one dashboard for all of them. Cash flow at a glance.", name: 'Sandra K.', role: 'Landlord, Tampa' },
+  { quote: "Showed my private lender the reports and he funded my next two deals on the spot. Looks that professional.", name: 'Tomas V.', role: 'Developer, Denver' },
+  { quote: "Simple enough that I actually use it every day, detailed enough to run my whole operation. Rare combo.", name: 'Jordan P.', role: 'House Flipper, Newark' },
+]
+
+function TestimonialCard({ quote, name, role }: { quote: string; name: string; role: string }) {
+  return (
+    <div className="card w-80 shrink-0 mx-3">
+      <div className="flex gap-1 mb-3 text-amber-400">
+        {'★★★★★'.split('').map((s, i) => <span key={i}>{s}</span>)}
+      </div>
+      <p className="text-gray-700 mb-4 leading-relaxed text-sm">"{quote}"</p>
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
+          {name.charAt(0)}
+        </div>
+        <div>
+          <p className="font-semibold text-gray-900 text-sm">{name}</p>
+          <p className="text-xs text-gray-500">{role}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Home() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly')
 
@@ -337,35 +371,30 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 bg-gray-50 border-t border-gray-100">
-        <div className="container-max">
+      <section className="py-24 bg-gray-50 border-t border-gray-100 overflow-hidden">
+        <div className="container-max mb-12">
           <h2 className="section-title text-center mb-4">Loved by operators</h2>
-          <p className="text-center text-gray-600 mb-12">See what real estate pros say about running their business on DealVault.</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { quote: "I used to run five flips out of a mess of spreadsheets. Now I know my exact profit on every project at a glance.", name: 'Marcus T.', role: 'House Flipper, Atlanta' },
-              { quote: "The analyzer alone paid for itself. I passed on a deal that looked good but failed the 70% rule — dodged a bad one.", name: 'Priya S.', role: 'Investor, Dallas' },
-              { quote: "Finally something between a spreadsheet and Procore. My contractors, budgets, and docs are all in one place.", name: 'Danny R.', role: 'Small Developer, Chicago' },
-            ].map((t) => (
-              <div key={t.name} className="card">
-                <div className="flex gap-1 mb-3 text-amber-400">
-                  {'★★★★★'.split('').map((s, i) => <span key={i}>{s}</span>)}
-                </div>
-                <p className="text-gray-700 mb-4 leading-relaxed">"{t.quote}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white text-sm font-bold">
-                    {t.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 text-sm">{t.name}</p>
-                    <p className="text-xs text-gray-500">{t.role}</p>
-                  </div>
-                </div>
-              </div>
+          <p className="text-center text-gray-600">See what real estate pros say about running their business on DealVault.</p>
+        </div>
+
+        {/* Marquee row 1 */}
+        <div className="marquee-mask mb-6">
+          <div className="marquee-track">
+            {[...testimonials, ...testimonials].map((t, i) => (
+              <TestimonialCard key={`a-${i}`} {...t} />
             ))}
           </div>
-          <p className="text-center text-xs text-gray-400 mt-8">Illustrative testimonials shown while we onboard our first customers.</p>
         </div>
+        {/* Marquee row 2 (reverse) */}
+        <div className="marquee-mask">
+          <div className="marquee-track marquee-reverse">
+            {[...testimonials2, ...testimonials2].map((t, i) => (
+              <TestimonialCard key={`b-${i}`} {...t} />
+            ))}
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-gray-400 mt-12">Illustrative testimonials shown while we onboard our first customers.</p>
       </section>
 
       {/* FAQ Section */}

@@ -167,9 +167,9 @@ export default function AnalyzerPage() {
             <div className={`card border-2 ${passes70 ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">70% Rule Verdict</p>
+                  <p className="text-sm font-medium text-gray-600">DealVault Score</p>
                   <p className={`text-2xl font-bold ${passes70 ? 'text-green-700' : 'text-red-700'}`}>
-                    {farv === 0 ? 'Enter ARV' : passes70 ? 'Deal Passes' : 'Overpriced'}
+                    {farv === 0 ? 'Enter ARV' : passes70 ? 'Strong Buy' : 'Overpriced'}
                   </p>
                 </div>
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center ${passes70 ? 'bg-green-500' : 'bg-red-500'}`}>
@@ -177,7 +177,7 @@ export default function AnalyzerPage() {
                 </div>
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                Max allowable offer (70% of ARV − rehab): <span className="font-semibold">${fmt(mao)}</span>
+                Recommended max offer: <span className="font-semibold">${fmt(mao)}</span>
                 {fp > 0 && ` · you're offering $${fmt(fp)}`}
               </p>
             </div>
@@ -201,7 +201,7 @@ export default function AnalyzerPage() {
               </div>
             </div>
             <p className="text-xs text-gray-400 px-1">
-              Rule of thumb: aim for profit margin above 15% and ROI above 20%. The 70% rule builds in a safety buffer for surprises.
+              Rule of thumb: aim for a profit margin above 15% and ROI above 20%. Our recommended max offer builds in a safety buffer for surprises.
             </p>
           </div>
         </div>
