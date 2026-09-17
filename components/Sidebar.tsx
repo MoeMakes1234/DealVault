@@ -29,7 +29,6 @@ const navItems = [
   { href: '/dashboard/deals', label: 'Deals', icon: Building2 },
   { href: '/dashboard/contractors', label: 'Contractors', icon: Users },
   { href: '/dashboard/documents', label: 'Documents', icon: FileText },
-  { href: '/dashboard/timeline', label: 'Timeline', icon: Clock },
   { href: '/dashboard/reports', label: 'Reports', icon: BarChart3 },
   { href: '/dashboard/assistant', label: 'AI Assistant', icon: Sparkles },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },

@@ -38,6 +38,8 @@ export default function DealDetailPage() {
   const addBudgetItem = useStore((s) => s.addBudgetItem)
   const deleteBudgetItem = useStore((s) => s.deleteBudgetItem)
   const updateTask = useStore((s) => s.updateTask)
+  const addTask = useStore((s) => s.addTask)
+  const deleteTask = useStore((s) => s.deleteTask)
   const addDealPhoto = useStore((s) => s.addDealPhoto)
   const removeDealPhoto = useStore((s) => s.removeDealPhoto)
   const addUnit = useStore((s) => s.addUnit)
@@ -53,6 +55,8 @@ export default function DealDetailPage() {
   const [uForm, setUForm] = useState({ name: '', beds: '', baths: '', sqft: '', status: 'planned' as Unit['status'], targetRent: '', targetSalePrice: '' })
   const [showInvestorForm, setShowInvestorForm] = useState(false)
   const [iForm, setIForm] = useState({ name: '', type: 'equity' as Investor['type'], amount: '', ownershipPct: '', preferredReturn: '', interestRate: '', lenderType: '' })
+  const [showTaskForm, setShowTaskForm] = useState(false)
+  const [tForm, setTForm] = useState({ title: '', dueDate: '' })
 
   if (!deal) {
     return (
@@ -131,6 +135,14 @@ export default function DealDetailPage() {
   const cycleTask = (task: TimelineTask) => {
     const order: TimelineTask['status'][] = ['pending', 'in-progress', 'done']
     updateTask(task.id, { status: order[(order.indexOf(task.status) + 1) % order.length] })
+  }
+
+  const handleAddTask = (e: React.FormEvent) => {
+    e.preventDefault()
+    addTask({ dealId, title: tForm.title, status: 'pending', dueDate: tForm.dueDate || undefined })
+    setTForm({ title: '', dueDate: '' })
+    setShowTaskForm(false)
+    toast('Task added')
   }
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -437,27 +449,48 @@ export default function DealDetailPage() {
 
           {/* Timeline */}
           <div className="card">
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Clock className="w-5 h-5 text-gray-400" /> Timeline</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold flex items-center gap-2"><Clock className="w-5 h-5 text-gray-400" /> Timeline</h3>
+              <button onClick={() => setShowTaskForm(true)} className="text-blue-600 text-sm font-medium flex items-center gap-1 hover:text-blue-700">
+                <Plus className="w-4 h-4" /> Add Task
+              </button>
+            </div>
+            {showTaskForm && (
+              <form onSubmit={handleAddTask} className="flex flex-col sm:flex-row gap-2 mb-4 p-3 bg-gray-50 rounded-lg">
+                <input required value={tForm.title} onChange={(e) => setTForm({ ...tForm, title: e.target.value })}
+                  placeholder="e.g. Drywall & paint" className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
+                <input type="date" value={tForm.dueDate} onChange={(e) => setTForm({ ...tForm, dueDate: e.target.value })}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
+                <button type="submit" className="btn-primary text-sm">Add</button>
+                <button type="button" onClick={() => setShowTaskForm(false)} className="btn-secondary text-sm">Cancel</button>
+              </form>
+            )}
             {tasks.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-6">No tasks yet. Add them from the Timeline page.</p>
+              <p className="text-sm text-gray-400 text-center py-6">No tasks yet. Add milestones like closing, demo, inspections, and final walkthrough.</p>
             ) : (
               <div className="space-y-2">
                 {tasks.sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || '')).map((task) => {
                   const Icon = statusIcon[task.status]
                   return (
-                    <div key={task.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                      <button onClick={() => cycleTask(task)} className="flex items-center gap-3 text-left">
+                    <div key={task.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 group">
+                      <button onClick={() => cycleTask(task)} className="flex items-center gap-3 text-left flex-1">
                         <span className={`w-6 h-6 rounded-full flex items-center justify-center ${statusStyle[task.status]}`}>
                           <Icon className="w-3.5 h-3.5" />
                         </span>
                         <span className="text-sm text-gray-900">{task.title}</span>
                       </button>
-                      {task.dueDate && <span className="text-xs text-gray-400">{task.dueDate}</span>}
+                      <div className="flex items-center gap-3">
+                        {task.dueDate && <span className="text-xs text-gray-400">{task.dueDate}</span>}
+                        <button onClick={() => { deleteTask(task.id); toast('Task removed', 'info') }} className="text-gray-300 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   )
                 })}
               </div>
             )}
+            <p className="text-xs text-gray-400 mt-3">Click a task's circle to cycle it: pending → in progress → done.</p>
           </div>
         </div>
 

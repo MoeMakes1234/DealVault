@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Calculator, TrendingUp, Home, DollarSign, Check, X, Trash2, ArrowRight, Percent, Save } from 'lucide-react'
 import { useStore } from '@/lib/store'
 import { useToast } from '@/lib/toast'
+import PageGuide from '@/components/PageGuide'
 
 type Tab = 'flip' | 'rental' | 'financing'
 
@@ -116,6 +117,10 @@ export default function AnalyzerPage() {
         </div>
         <p className="text-gray-500 text-sm mt-1">Run the numbers before you commit. Analyze a property, then convert winners into tracked deals.</p>
       </div>
+
+      <PageGuide id="analyzer" title="How the Analyzer works">
+        Pick a tab for your deal type. <strong>Flip</strong> checks if a property will profit (enter purchase price, rehab, and ARV — the after-repair value). <strong>Rental</strong> shows cap rate and cash flow. <strong>Financing</strong> models your loan payment. Hit <strong>Save Analysis</strong> to keep it, then <strong>Convert to Deal</strong> to start tracking a winner.
+      </PageGuide>
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6 border-b border-gray-200">

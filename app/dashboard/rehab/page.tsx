@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Hammer, Plus, Trash2, ArrowRight, RotateCcw } from 'lucide-react'
 import { useStore } from '@/lib/store'
 import { useToast } from '@/lib/toast'
+import PageGuide from '@/components/PageGuide'
 
 interface LineItem {
   id: string
@@ -90,6 +91,10 @@ export default function RehabEstimatorPage() {
         </div>
         <p className="text-gray-500 text-sm mt-1">Build a renovation budget line by line, then send the total straight to the Analyzer.</p>
       </div>
+
+      <PageGuide id="rehab" title="How the Rehab Estimator works">
+        Click the <strong>Quick Add</strong> buttons for common jobs, or add your own line with any category. Your running total (plus a contingency buffer from Settings) shows on the right. Hit <strong>Use in Analyzer</strong> and the total drops into your flip analysis automatically.
+      </PageGuide>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Presets + custom */}

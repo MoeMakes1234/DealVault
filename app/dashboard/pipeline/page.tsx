@@ -6,6 +6,7 @@ import { useStore, Deal } from '@/lib/store'
 import { useToast } from '@/lib/toast'
 import { fmtCompact } from '@/lib/format'
 import { GripVertical, TrendingUp } from 'lucide-react'
+import PageGuide from '@/components/PageGuide'
 
 type Stage = NonNullable<Deal['pipelineStage']>
 
@@ -48,6 +49,10 @@ export default function PipelinePage() {
         </div>
         <Link href="/dashboard/deals" className="btn-secondary text-sm">List View</Link>
       </div>
+
+      <PageGuide id="pipeline" title="How the Pipeline works">
+        Each card is one property. <strong>Drag a card</strong> between columns to move a deal through your stages — from Prospecting all the way to Sold. The number at the bottom of each column totals the expected profit sitting in that stage. Click any card to open its full details.
+      </PageGuide>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {stages.map((stage) => {

@@ -270,20 +270,20 @@ export default function Home() {
       {/* Comparison */}
       <section className="py-24 bg-gray-50 border-t border-gray-100">
         <div className="container-max max-w-4xl">
-          <h2 className="section-title text-center mb-4">Why not just a spreadsheet?</h2>
-          <p className="text-center text-gray-600 mb-12">Because your deals deserve better than formulas you have to rebuild every time.</p>
+          <h2 className="section-title text-center mb-4">Your deals deserve better than a spreadsheet</h2>
+          <p className="text-center text-gray-600 mb-12">Formulas break, tabs multiply, and one wrong cell throws off everything. DealVault just works.</p>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <div className="grid grid-cols-3 text-sm">
               <div className="p-4 font-semibold text-gray-500 border-b border-gray-100"></div>
               <div className="p-4 font-semibold text-gray-500 border-b border-l border-gray-100 text-center">Spreadsheets</div>
               <div className="p-4 font-semibold text-blue-600 border-b border-l border-gray-100 text-center bg-blue-50">DealVault</div>
               {[
-                'Deal analysis built in',
-                'Budget tracking by category',
-                'Contractor & document management',
-                'Multi-unit & capital stack',
-                'Works on your phone',
-                'Nothing breaks when you edit a cell',
+                'Know your profit before you buy',
+                'Catch budget overruns as they happen',
+                'Every contractor & document in one place',
+                'Handles flips and multi-unit developments',
+                'Works from your phone on the job site',
+                'No broken formulas, ever',
               ].map((row, i) => (
                 <div key={i} className="contents">
                   <div className="p-4 text-gray-700 border-b border-gray-50">{row}</div>

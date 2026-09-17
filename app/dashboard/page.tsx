@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Plus, DollarSign, TrendingUp, BarChart3, ArrowRight, Users, FileText, Clock, Calculator } from 'lucide-react'
+import { Plus, DollarSign, TrendingUp, BarChart3, ArrowRight, Users, FileText, Clock, Calculator, KanbanSquare } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from 'recharts'
 import { useStore } from '@/lib/store'
 import { fmtCompact } from '@/lib/format'
@@ -205,14 +205,14 @@ export default function DashboardOverview() {
           </div>
           <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
         </Link>
-        <Link href="/dashboard/timeline" className="card hover:shadow-md transition-shadow flex items-center justify-between group">
+        <Link href="/dashboard/pipeline" className="card hover:shadow-md transition-shadow flex items-center justify-between group">
           <div>
             <div className="flex items-center gap-2 text-green-600 mb-1">
-              <Clock className="w-4 h-4" />
-              <span className="text-sm font-semibold">Timeline</span>
+              <KanbanSquare className="w-4 h-4" />
+              <span className="text-sm font-semibold">Pipeline</span>
             </div>
-            <p className="text-2xl font-bold">View schedule</p>
-            <p className="text-xs text-gray-500">milestones & tasks</p>
+            <p className="text-2xl font-bold">Deal board</p>
+            <p className="text-xs text-gray-500">drag through stages</p>
           </div>
           <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
         </Link>
