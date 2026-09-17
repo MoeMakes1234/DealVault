@@ -6,6 +6,7 @@ import { Plus, DollarSign, TrendingUp, BarChart3, ArrowRight, Users, FileText, C
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from 'recharts'
 import { useStore } from '@/lib/store'
 import { fmtCompact } from '@/lib/format'
+import Onboarding from '@/components/Onboarding'
 
 export default function DashboardOverview() {
   const deals = useStore((s) => s.deals)
@@ -37,6 +38,7 @@ export default function DashboardOverview() {
 
   return (
     <div className="container-max py-8">
+      <Onboarding />
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{firstName ? `Welcome back, ${firstName}` : 'Overview'}</h1>

@@ -111,13 +111,16 @@ export default function DealsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Deals</h1>
           <p className="text-gray-500 text-sm mt-1">Manage every property in your pipeline.</p>
         </div>
-        <button
-          onClick={openNew}
-          className="bg-blue-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors font-medium text-sm"
-        >
-          <Plus className="w-4 h-4" />
-          New Deal
-        </button>
+        <div className="flex items-center gap-2">
+          <Link href="/dashboard/pipeline" className="btn-secondary text-sm">Board View</Link>
+          <button
+            onClick={openNew}
+            className="bg-blue-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors font-medium text-sm"
+          >
+            <Plus className="w-4 h-4" />
+            New Deal
+          </button>
+        </div>
       </div>
 
       {/* Filters + search + sort */}

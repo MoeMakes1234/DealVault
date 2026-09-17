@@ -17,6 +17,7 @@ import {
   Calculator,
   Hammer,
   Settings,
+  KanbanSquare,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -24,6 +25,7 @@ const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/dashboard/analyzer', label: 'Analyzer', icon: Calculator },
   { href: '/dashboard/rehab', label: 'Rehab Estimator', icon: Hammer },
+  { href: '/dashboard/pipeline', label: 'Pipeline', icon: KanbanSquare },
   { href: '/dashboard/deals', label: 'Deals', icon: Building2 },
   { href: '/dashboard/contractors', label: 'Contractors', icon: Users },
   { href: '/dashboard/documents', label: 'Documents', icon: FileText },

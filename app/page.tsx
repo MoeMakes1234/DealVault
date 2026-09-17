@@ -190,6 +190,29 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Who it's for */}
+      <section className="py-24 bg-white border-t border-gray-100">
+        <div className="container-max">
+          <h2 className="section-title text-center mb-4">Built for every stage of the game</h2>
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Whether you're closing your first flip or breaking ground on a 40-unit build, DealVault grows with you.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { icon: HomeIcon, title: 'House Flippers', desc: 'Analyze deals with the numbers that matter, track rehab budgets line by line, and know your profit before you ever swing a hammer.' },
+              { icon: TrendingUp, title: 'Rental Investors', desc: 'Run cap rate and cash-flow analysis, manage your holdings, and keep every property\'s performance in one dashboard.' },
+              { icon: BarChart3, title: 'Developers', desc: 'Track multi-unit projects, model your capital stack with partners and lenders, and manage sellout across every unit.' },
+            ].map((a, i) => (
+              <div key={i} className="rounded-2xl border border-gray-200 p-8 hover:border-blue-300 hover:shadow-md transition-all">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-4">
+                  <a.icon className="w-6 h-6 text-blue-600" />
+                </div>
+                <h3 className="text-lg font-bold mb-2">{a.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{a.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="bg-white py-24 border-t border-gray-200">
         <div className="container-max">
@@ -240,6 +263,37 @@ export default function Home() {
                 <p className="text-gray-600">{feature.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Comparison */}
+      <section className="py-24 bg-gray-50 border-t border-gray-100">
+        <div className="container-max max-w-4xl">
+          <h2 className="section-title text-center mb-4">Why not just a spreadsheet?</h2>
+          <p className="text-center text-gray-600 mb-12">Because your deals deserve better than formulas you have to rebuild every time.</p>
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="grid grid-cols-3 text-sm">
+              <div className="p-4 font-semibold text-gray-500 border-b border-gray-100"></div>
+              <div className="p-4 font-semibold text-gray-500 border-b border-l border-gray-100 text-center">Spreadsheets</div>
+              <div className="p-4 font-semibold text-blue-600 border-b border-l border-gray-100 text-center bg-blue-50">DealVault</div>
+              {[
+                'Deal analysis built in',
+                'Budget tracking by category',
+                'Contractor & document management',
+                'Multi-unit & capital stack',
+                'Works on your phone',
+                'Nothing breaks when you edit a cell',
+              ].map((row, i) => (
+                <div key={i} className="contents">
+                  <div className="p-4 text-gray-700 border-b border-gray-50">{row}</div>
+                  <div className="p-4 border-b border-l border-gray-50 text-center text-gray-300">—</div>
+                  <div className="p-4 border-b border-l border-gray-50 text-center bg-blue-50/50">
+                    <CheckCircle className="w-5 h-5 text-green-500 inline" />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

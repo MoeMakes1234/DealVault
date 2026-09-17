@@ -37,6 +37,7 @@ export interface Deal {
   budget: number
   spent: number
   status: 'planning' | 'in-progress' | 'completed'
+  pipelineStage?: 'prospecting' | 'under-contract' | 'rehab' | 'listed' | 'sold'
   expectedProfit: number
   saleTarget?: number
   startDate?: string
@@ -176,6 +177,7 @@ const initialDeals: Deal[] = [
     budget: 75000,
     spent: 42000,
     status: 'in-progress',
+    pipelineStage: 'rehab',
     expectedProfit: 85000,
     saleTarget: 410000,
     startDate: '2026-02-01',
@@ -189,6 +191,7 @@ const initialDeals: Deal[] = [
     budget: 50000,
     spent: 50000,
     status: 'completed',
+    pipelineStage: 'sold',
     expectedProfit: 62000,
     saleTarget: 292000,
     startDate: '2025-11-01',
@@ -202,6 +205,7 @@ const initialDeals: Deal[] = [
     budget: 2400000,
     spent: 850000,
     status: 'in-progress',
+    pipelineStage: 'rehab',
     expectedProfit: 1150000,
     saleTarget: 4750000,
     startDate: '2026-01-15',
