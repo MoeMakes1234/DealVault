@@ -61,7 +61,7 @@ export default function RehabEstimatorPage() {
   const addCustom = (e: React.FormEvent) => {
     e.preventDefault()
     if (!custom.label) return
-    setItems((prev) => [...prev, { id: Date.now().toString(), category: custom.category, label: custom.label, cost: Number(custom.cost) || 0 }])
+    setItems((prev) => [...prev, { id: Date.now().toString(), category: custom.category.trim() || 'Other', label: custom.label, cost: Number(custom.cost) || 0 }])
     setCustom({ category: custom.category, label: '', cost: '' })
   }
 
@@ -114,16 +114,24 @@ export default function RehabEstimatorPage() {
           <div className="card">
             <h3 className="font-bold mb-4">Add Custom Item</h3>
             <form onSubmit={addCustom} className="flex flex-col sm:flex-row gap-3">
-              <select value={custom.category} onChange={(e) => setCustom({ ...custom, category: e.target.value })}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                {Object.keys(categoryColors).map((c) => <option key={c}>{c}</option>)}
-              </select>
+              <input
+                value={custom.category}
+                onChange={(e) => setCustom({ ...custom, category: e.target.value })}
+                list="rehab-categories"
+                placeholder="Category"
+                className="sm:w-40 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+              <datalist id="rehab-categories">
+                {Object.keys(categoryColors).map((c) => <option key={c} value={c} />)}
+                {['Foundation', 'Pool', 'Solar', 'Septic', 'Driveway', 'Garage', 'Deck / Patio', 'Appliances', 'Insulation', 'Drywall'].map((c) => <option key={c} value={c} />)}
+              </datalist>
               <input value={custom.label} onChange={(e) => setCustom({ ...custom, label: e.target.value })}
                 placeholder="Description" className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
               <input type="number" value={custom.cost} onChange={(e) => setCustom({ ...custom, cost: e.target.value })}
                 placeholder="Cost $" className="w-28 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
               <button type="submit" className="btn-primary text-sm">Add</button>
             </form>
+            <p className="text-xs text-gray-400 mt-2">Pick a suggested category or type your own — anything goes.</p>
           </div>
 
           {/* Line items */}
