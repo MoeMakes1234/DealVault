@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { CheckCircle, TrendingUp, Users, FileText, BarChart3, Clock, Home as HomeIcon, DollarSign, ArrowRight, Calculator } from 'lucide-react'
+import { CheckCircle, TrendingUp, Users, FileText, BarChart3, Clock, Home as HomeIcon, DollarSign, ArrowRight, Calculator, X } from 'lucide-react'
 import { useState } from 'react'
 import { Reveal, CountUp } from '@/components/Reveal'
 
@@ -71,22 +71,24 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Decorative gradient blobs */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-blue-50/60 via-white to-white">
+        {/* Decorative gradient blobs + grid */}
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-200 rounded-full blur-3xl opacity-30" />
-          <div className="absolute top-20 right-1/4 w-96 h-96 bg-indigo-200 rounded-full blur-3xl opacity-30" />
+          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-300 rounded-full blur-3xl opacity-25" />
+          <div className="absolute top-20 right-1/4 w-[500px] h-[500px] bg-indigo-300 rounded-full blur-3xl opacity-25" />
+          <div className="absolute top-40 left-1/2 w-[400px] h-[400px] bg-purple-200 rounded-full blur-3xl opacity-20" />
+          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
         </div>
         <div className="container-max py-24">
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-              <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+            <div className="inline-flex items-center gap-2 bg-white border border-blue-100 text-blue-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6 shadow-sm">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               Built for flippers &amp; developers
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-[1.05] tracking-tight">
               Manage Your Real Estate <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Empire</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
               Analyze deals, track budgets, manage contractors, and see real-time profitability across every project — all in one place.
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
@@ -97,12 +99,38 @@ export default function Home() {
                 See Features
               </a>
             </div>
-            <p className="text-gray-500 mt-4">No credit card required • 14-day free trial</p>
+            <div className="flex items-center justify-center gap-6 mt-6 text-sm text-gray-500 flex-wrap">
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" /> No credit card required</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" /> 14-day free trial</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" /> Cancel anytime</span>
+            </div>
           </div>
 
         {/* Hero dashboard mockup */}
-        <div className="rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 p-1.5 shadow-2xl max-w-5xl mx-auto animate-fade-in">
-          <div className="bg-gray-50 rounded-xl overflow-hidden">
+        <div className="relative max-w-5xl mx-auto">
+          {/* Floating verdict badge */}
+          <div className="hidden md:flex absolute -left-6 top-24 z-20 bg-white rounded-xl shadow-xl border border-gray-100 p-3 items-center gap-3 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <div className="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
+              <CheckCircle className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-[10px] text-gray-400 leading-tight">Deal verdict</p>
+              <p className="text-sm font-bold text-green-600 leading-tight">Strong Buy</p>
+            </div>
+          </div>
+          {/* Floating profit badge */}
+          <div className="hidden md:flex absolute -right-6 bottom-16 z-20 bg-white rounded-xl shadow-xl border border-gray-100 p-3 items-center gap-3 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+            <div className="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-[10px] text-gray-400 leading-tight">Projected profit</p>
+              <p className="text-sm font-bold text-gray-900 leading-tight">+$87,000</p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 p-1.5 shadow-2xl animate-fade-in">
+            <div className="bg-gray-50 rounded-xl overflow-hidden">
             {/* Fake browser bar */}
             <div className="bg-white border-b border-gray-200 px-4 py-2.5 flex items-center gap-2">
               <div className="flex gap-1.5">
@@ -169,6 +197,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
         </div>
@@ -355,35 +384,79 @@ export default function Home() {
       </section>
 
       {/* Comparison */}
-      <section className="py-24 bg-gray-50 border-t border-gray-100">
-        <div className="container-max max-w-4xl">
+      <section className="py-24 bg-gray-50 border-t border-gray-100 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+        <div className="container-max max-w-5xl relative">
           <Reveal>
             <h2 className="section-title text-center mb-4">Your deals deserve better than a spreadsheet</h2>
-            <p className="text-center text-gray-600 mb-12">Formulas break, tabs multiply, and one wrong cell throws off everything. DealVault just works.</p>
+            <p className="text-center text-gray-600 mb-14 max-w-2xl mx-auto">Formulas break, tabs multiply, and one wrong cell throws off everything. DealVault just works.</p>
           </Reveal>
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="grid grid-cols-3 text-sm">
-              <div className="p-4 font-semibold text-gray-500 border-b border-gray-100"></div>
-              <div className="p-4 font-semibold text-gray-500 border-b border-l border-gray-100 text-center">Spreadsheets</div>
-              <div className="p-4 font-semibold text-blue-600 border-b border-l border-gray-100 text-center bg-blue-50">DealVault</div>
-              {[
-                'Know your profit before you buy',
-                'Catch budget overruns as they happen',
-                'Every contractor & document in one place',
-                'Handles flips and multi-unit developments',
-                'Works from your phone on the job site',
-                'No broken formulas, ever',
-              ].map((row, i) => (
-                <div key={i} className="contents">
-                  <div className="p-4 text-gray-700 border-b border-gray-50">{row}</div>
-                  <div className="p-4 border-b border-l border-gray-50 text-center text-gray-300">—</div>
-                  <div className="p-4 border-b border-l border-gray-50 text-center bg-blue-50/50">
-                    <CheckCircle className="w-5 h-5 text-green-500 inline" />
+
+          <Reveal>
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Spreadsheet column */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center">
+                    <FileText className="w-6 h-6 text-gray-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900">The spreadsheet way</h3>
+                    <p className="text-xs text-gray-400">Tabs, formulas, and crossed fingers</p>
                   </div>
                 </div>
-              ))}
+                <div className="space-y-3">
+                  {[
+                    'Rebuild the same formulas every deal',
+                    'No idea if a deal pencils until it\'s too late',
+                    'Contractor info scattered across texts',
+                    'One wrong cell breaks everything',
+                    'Useless on your phone at a job site',
+                  ].map((row) => (
+                    <div key={row} className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center shrink-0 mt-0.5">
+                        <X className="w-3 h-3 text-red-400" />
+                      </div>
+                      <span className="text-sm text-gray-500">{row}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* DealVault column - highlighted */}
+              <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl p-8 shadow-xl shadow-blue-600/20 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
+                <div className="flex items-center gap-3 mb-6 relative">
+                  <div className="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
+                    <HomeIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-white">The DealVault way</h3>
+                    <p className="text-xs text-blue-100">Everything in one place, always</p>
+                  </div>
+                </div>
+                <div className="space-y-3 relative">
+                  {[
+                    'Know your profit before you buy',
+                    'Instant buy-or-pass verdict on any deal',
+                    'Every contractor & document organized',
+                    'Nothing breaks — ever',
+                    'Works right from your phone',
+                  ].map((row) => (
+                    <div key={row} className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 mt-0.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      <span className="text-sm text-white font-medium">{row}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link href="/auth/signup" className="inline-flex items-center gap-2 mt-7 bg-white text-blue-700 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-colors relative">
+                  Make the switch <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
