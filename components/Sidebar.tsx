@@ -18,6 +18,7 @@ import {
   Hammer,
   Settings,
   KanbanSquare,
+  FileSpreadsheet,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -30,6 +31,7 @@ const navItems = [
   { href: '/dashboard/contractors', label: 'Contractors', icon: Users },
   { href: '/dashboard/documents', label: 'Documents', icon: FileText },
   { href: '/dashboard/reports', label: 'Reports', icon: BarChart3 },
+  { href: '/dashboard/import', label: 'Import', icon: FileSpreadsheet },
   { href: '/dashboard/assistant', label: 'AI Assistant', icon: Sparkles },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]

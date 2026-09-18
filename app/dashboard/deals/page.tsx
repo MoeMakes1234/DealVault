@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Plus, Trash2, Edit2, X, Search, ArrowUpDown, Building2, ChevronRight } from 'lucide-react'
+import { Plus, Trash2, Edit2, X, Search, ArrowUpDown, Building2, ChevronRight, FileSpreadsheet } from 'lucide-react'
 import { useStore, Deal } from '@/lib/store'
 import { useToast } from '@/lib/toast'
 import { fmtCompact } from '@/lib/format'
@@ -112,6 +112,7 @@ export default function DealsPage() {
           <p className="text-gray-500 text-sm mt-1">Manage every property in your pipeline.</p>
         </div>
         <div className="flex items-center gap-2">
+          <Link href="/dashboard/import" className="btn-secondary text-sm">Import</Link>
           <Link href="/dashboard/pipeline" className="btn-secondary text-sm">Board View</Link>
           <button
             onClick={openNew}
@@ -329,9 +330,14 @@ export default function DealsPage() {
                 : 'Add your first property to start tracking budgets, contractors, and profit.'}
             </p>
             {!search && filter === 'all' && (
-              <button onClick={openNew} className="btn-primary inline-flex items-center gap-2 text-sm">
-                <Plus className="w-4 h-4" /> Add Your First Deal
-              </button>
+              <div className="flex items-center justify-center gap-3 flex-wrap">
+                <button onClick={openNew} className="btn-primary inline-flex items-center gap-2 text-sm">
+                  <Plus className="w-4 h-4" /> Add Your First Deal
+                </button>
+                <Link href="/dashboard/import" className="btn-secondary inline-flex items-center gap-2 text-sm">
+                  <FileSpreadsheet className="w-4 h-4" /> Import from Spreadsheet
+                </Link>
+              </div>
             )}
           </div>
         ) : (
