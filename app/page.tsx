@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { CheckCircle, TrendingUp, Users, FileText, BarChart3, Clock, Home as HomeIcon, DollarSign, ArrowRight, Calculator } from 'lucide-react'
 import { useState } from 'react'
+import { Reveal, CountUp } from '@/components/Reveal'
 
 const testimonials = [
   { quote: "I used to run five flips out of a mess of spreadsheets. Now I know my exact profit on every project at a glance.", name: 'Marcus T.', role: 'House Flipper, Atlanta' },
@@ -174,40 +175,50 @@ export default function Home() {
       </section>
 
       {/* Stats band */}
-      <section className="bg-gradient-to-r from-blue-600 to-indigo-600 py-12">
-        <div className="container-max grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
-          {[
-            { stat: '$50M+', label: 'TAM opportunity' },
-            { stat: '100K+', label: 'US flippers' },
-            { stat: '6', label: 'tools in one' },
-            { stat: '14 days', label: 'free to try' },
-          ].map((s) => (
-            <div key={s.label}>
-              <p className="text-3xl md:text-4xl font-bold">{s.stat}</p>
-              <p className="text-blue-100 text-sm mt-1">{s.label}</p>
-            </div>
-          ))}
+      <section className="bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 py-14 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="container-max grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white relative">
+          <div>
+            <p className="text-3xl md:text-5xl font-bold"><CountUp value={50} prefix="$" suffix="M+" /></p>
+            <p className="text-blue-100 text-sm mt-1">market opportunity</p>
+          </div>
+          <div>
+            <p className="text-3xl md:text-5xl font-bold"><CountUp value={100} suffix="K+" /></p>
+            <p className="text-blue-100 text-sm mt-1">US flippers &amp; developers</p>
+          </div>
+          <div>
+            <p className="text-3xl md:text-5xl font-bold"><CountUp value={8} suffix="" /></p>
+            <p className="text-blue-100 text-sm mt-1">tools in one platform</p>
+          </div>
+          <div>
+            <p className="text-3xl md:text-5xl font-bold"><CountUp value={14} suffix=" days" /></p>
+            <p className="text-blue-100 text-sm mt-1">free to try</p>
+          </div>
         </div>
       </section>
 
       {/* Who it's for */}
       <section className="py-24 bg-white border-t border-gray-100">
         <div className="container-max">
-          <h2 className="section-title text-center mb-4">Built for every stage of the game</h2>
-          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Whether you're closing your first flip or breaking ground on a 40-unit build, DealVault grows with you.</p>
+          <Reveal>
+            <h2 className="section-title text-center mb-4">Built for every stage of the game</h2>
+            <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Whether you're closing your first flip or breaking ground on a 40-unit build, DealVault grows with you.</p>
+          </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { icon: HomeIcon, title: 'House Flippers', desc: 'Analyze deals with the numbers that matter, track rehab budgets line by line, and know your profit before you ever swing a hammer.' },
               { icon: TrendingUp, title: 'Rental Investors', desc: 'Run cap rate and cash-flow analysis, manage your holdings, and keep every property\'s performance in one dashboard.' },
               { icon: BarChart3, title: 'Developers', desc: 'Track multi-unit projects, model your capital stack with partners and lenders, and manage sellout across every unit.' },
             ].map((a, i) => (
-              <div key={i} className="rounded-2xl border border-gray-200 p-8 hover:border-blue-300 hover:shadow-md transition-all">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-4">
-                  <a.icon className="w-6 h-6 text-blue-600" />
+              <Reveal key={i} delay={i * 120}>
+                <div className="rounded-2xl border border-gray-200 p-8 hover:border-blue-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 h-full bg-gradient-to-b from-white to-gray-50/50">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center mb-4 shadow-sm">
+                    <a.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">{a.title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{a.desc}</p>
                 </div>
-                <h3 className="text-lg font-bold mb-2">{a.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{a.desc}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -216,23 +227,25 @@ export default function Home() {
       {/* Features Section */}
       <section id="features" className="bg-white py-24 border-t border-gray-200">
         <div className="container-max">
-          <h2 className="section-title text-center mb-16">Everything You Need</h2>
+          <Reveal>
+            <h2 className="section-title text-center mb-16">Everything You Need</h2>
+          </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
                 icon: Calculator,
                 title: 'Property Analyzer',
-                desc: 'Run the 70% rule, ROI, cap rate, and financing on any property before you commit — then convert winners into deals.',
+                desc: 'Check ROI, cap rate, and financing on any property before you commit — then convert winners into deals.',
               },
               {
                 icon: BarChart3,
                 title: 'Deal Pipeline',
-                desc: 'Track all your projects from acquisition to sale with real-time profitability tracking.',
+                desc: 'Drag every project from prospecting to sold, with real-time profitability at each stage.',
               },
               {
                 icon: TrendingUp,
                 title: 'Budget Management',
-                desc: 'Set budgets and track actual costs. Never go over budget on a project again.',
+                desc: 'Set budgets and track actual costs by category. Never blow a rehab budget again.',
               },
               {
                 icon: Users,
@@ -245,24 +258,98 @@ export default function Home() {
                 desc: 'Organize contracts, permits, inspections, and title docs all in one place.',
               },
               {
-                icon: Clock,
-                title: 'Timeline View',
-                desc: 'Visual project timeline with milestones and task tracking built-in.',
+                icon: BarChart3,
+                title: 'Capital Stack',
+                desc: 'Model equity partners, lenders, and ownership splits on your larger developments.',
               },
               {
                 icon: CheckCircle,
                 title: 'Smart Reports',
                 desc: 'Export detailed P&L statements and profitability reports for each deal.',
               },
+              {
+                icon: FileText,
+                title: 'Spreadsheet Import',
+                desc: 'Already tracking deals elsewhere? Bring them in from any spreadsheet — no retyping.',
+              },
             ].map((feature, i) => (
-              <div key={i} className="card hover:shadow-md hover:-translate-y-1 transition-all duration-200">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-blue-600" />
+              <Reveal key={i} delay={(i % 3) * 100}>
+                <div className="card hover:shadow-lg hover:-translate-y-1 transition-all duration-300 h-full">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center mb-4 shadow-sm">
+                    <feature.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
+                  <p className="text-gray-600">{feature.desc}</p>
                 </div>
-                <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.desc}</p>
-              </div>
+              </Reveal>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Dark showcase — Analyzer spotlight */}
+      <section className="bg-[#0a0e27] py-24 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 80% 20%, #3b82f6 0px, transparent 40%), radial-gradient(circle at 10% 80%, #6366f1 0px, transparent 40%)' }} />
+        <div className="container-max relative">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <Reveal>
+              <div>
+                <div className="inline-flex items-center gap-2 bg-white/10 text-blue-300 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+                  <Calculator className="w-4 h-4" /> Know before you buy
+                </div>
+                <h2 className="text-4xl font-bold text-white mb-4 leading-tight">Stop guessing whether a deal will make money</h2>
+                <p className="text-gray-400 text-lg mb-8 leading-relaxed">
+                  Punch in the numbers and get an instant verdict — projected profit, ROI, and a clear buy-or-pass call. Analyze rentals and model financing too, then turn winners into tracked deals with one click.
+                </p>
+                <div className="space-y-3">
+                  {['Instant flip profit & ROI analysis', 'Cap rate and cash flow for rentals', 'Recommended max offer with a safety buffer', 'One click from analysis to tracked deal'].map((item) => (
+                    <div key={item} className="flex items-center gap-3 text-gray-300">
+                      <CheckCircle className="w-5 h-5 text-green-400 shrink-0" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link href="/auth/signup" className="inline-flex items-center gap-2 mt-8 bg-white text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                  Try the Analyzer free <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </Reveal>
+
+            {/* Mock analyzer card */}
+            <Reveal delay={200}>
+              <div className="bg-white/5 backdrop-blur rounded-2xl border border-white/10 p-6">
+                <div className="bg-white rounded-xl p-5">
+                  <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                    <div>
+                      <p className="text-xs text-gray-400">42 Sycamore Lane</p>
+                      <p className="font-bold text-gray-900">Flip Analysis</p>
+                    </div>
+                    <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">STRONG BUY</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <p className="text-xs text-gray-400">Projected Profit</p>
+                      <p className="text-2xl font-bold text-green-600">$87K</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400">ROI</p>
+                      <p className="text-2xl font-bold text-gray-900">28.4%</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400">All-In Cost</p>
+                      <p className="text-lg font-semibold text-gray-900">$306K</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400">Max Offer</p>
+                      <p className="text-lg font-semibold text-gray-900">$197K</p>
+                    </div>
+                  </div>
+                  <div className="bg-green-50 rounded-lg p-3 text-sm text-green-800">
+                    This deal clears your margin targets with room to spare.
+                  </div>
+                </div>
+              </div>
+            </Reveal>
           </div>
         </div>
       </section>
@@ -270,8 +357,10 @@ export default function Home() {
       {/* Comparison */}
       <section className="py-24 bg-gray-50 border-t border-gray-100">
         <div className="container-max max-w-4xl">
-          <h2 className="section-title text-center mb-4">Your deals deserve better than a spreadsheet</h2>
-          <p className="text-center text-gray-600 mb-12">Formulas break, tabs multiply, and one wrong cell throws off everything. DealVault just works.</p>
+          <Reveal>
+            <h2 className="section-title text-center mb-4">Your deals deserve better than a spreadsheet</h2>
+            <p className="text-center text-gray-600 mb-12">Formulas break, tabs multiply, and one wrong cell throws off everything. DealVault just works.</p>
+          </Reveal>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <div className="grid grid-cols-3 text-sm">
               <div className="p-4 font-semibold text-gray-500 border-b border-gray-100"></div>
