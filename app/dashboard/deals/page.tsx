@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Plus, Trash2, Edit2, X, Search, ArrowUpDown, Building2, ChevronRight, FileSpreadsheet } from 'lucide-react'
+import { Plus, Trash2, Edit2, X, Search, ArrowUpDown, Building2, ChevronRight, FileSpreadsheet, Copy } from 'lucide-react'
 import { useStore, Deal } from '@/lib/store'
 import { useToast } from '@/lib/toast'
 import { fmtCompact } from '@/lib/format'
+import { useConfirm } from '@/components/ConfirmDialog'
 
 type SortKey = 'newest' | 'profit' | 'budget-usage' | 'address'
 
@@ -29,6 +30,7 @@ export default function DealsPage() {
   const deleteDeal = useStore((s) => s.deleteDeal)
 
   const toast = useToast((s) => s.show)
+  const confirm = useConfirm((s) => s.ask)
 
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -416,6 +418,17 @@ export default function DealsPage() {
                     <ChevronRight className="w-4 h-4" />
                   </Link>
                   <button
+                    onClick={() => {
+                      const { id, units, ...rest } = deal
+                      addDeal({ ...rest, address: `${deal.address} (copy)`, units: units ? units.map((u) => ({ ...u, id: Math.random().toString(36).slice(2) })) : undefined })
+                      toast('Deal duplicated')
+                    }}
+                    className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="Duplicate"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button
                     onClick={() => openEdit(deal)}
                     className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     title="Edit"
@@ -423,12 +436,15 @@ export default function DealsPage() {
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => {
-                      if (confirm(`Delete "${deal.address}"? This also removes its budget lines and tasks.`)) {
-                        deleteDeal(deal.id)
-                        toast('Deal deleted', 'info')
-                      }
-                    }}
+                    onClick={() =>
+                      confirm({
+                        message: `Delete "${deal.address}"? This also removes its budget lines, units, and tasks.`,
+                        onConfirm: () => {
+                          deleteDeal(deal.id)
+                          toast('Deal deleted', 'info')
+                        },
+                      })
+                    }
                     className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     title="Delete"
                   >

@@ -4,16 +4,19 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Plus, DollarSign, TrendingUp, BarChart3, ArrowRight, Users, FileText, Clock, Calculator, KanbanSquare } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from 'recharts'
-import { useStore } from '@/lib/store'
+import { useStore, Deal } from '@/lib/store'
 import { fmtCompact } from '@/lib/format'
 import Onboarding from '@/components/Onboarding'
 
 export default function DashboardOverview() {
-  const deals = useStore((s) => s.deals)
+  const allDeals = useStore((s) => s.deals)
   const contractors = useStore((s) => s.contractors)
   const documents = useStore((s) => s.documents)
   const settings = useStore((s) => s.settings)
   const firstName = settings.fullName ? settings.fullName.split(' ')[0] : ''
+
+  const [typeFilter, setTypeFilter] = useState<'all' | NonNullable<Deal['projectType']>>('all')
+  const deals = typeFilter === 'all' ? allDeals : allDeals.filter((d) => (d.projectType || 'flip') === typeFilter)
 
   const totalInvested = deals.reduce((sum, d) => sum + d.acquisitionPrice, 0)
   const totalSpent = deals.reduce((sum, d) => sum + d.spent, 0)
@@ -51,6 +54,32 @@ export default function DashboardOverview() {
           <Plus className="w-4 h-4" />
           New Deal
         </Link>
+      </div>
+
+      {/* Portfolio filter */}
+      <div className="flex gap-2 mb-6 flex-wrap">
+        {([
+          ['all', 'All Deals'],
+          ['flip', 'Flips'],
+          ['rental', 'Rentals'],
+          ['multifamily', 'Multifamily'],
+          ['new-construction', 'New Build'],
+          ['mixed-use', 'Mixed-Use'],
+        ] as const).map(([val, label]) => {
+          const count = val === 'all' ? allDeals.length : allDeals.filter((d) => (d.projectType || 'flip') === val).length
+          if (val !== 'all' && count === 0) return null
+          return (
+            <button
+              key={val}
+              onClick={() => setTypeFilter(val)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                typeFilter === val ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              {label} <span className={typeFilter === val ? 'text-blue-200' : 'text-gray-400'}>{count}</span>
+            </button>
+          )
+        })}
       </div>
 
       {/* KPI Cards */}

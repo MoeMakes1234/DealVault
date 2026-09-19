@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Trash2, X, Star, Phone, Mail } from 'lucide-react'
+import { Plus, Trash2, X, Star, Phone, Mail, Edit2, Users } from 'lucide-react'
 import { useStore, Contractor } from '@/lib/store'
 import { useToast } from '@/lib/toast'
+import { useConfirm } from '@/components/ConfirmDialog'
 
 const emptyForm = {
   name: '',
@@ -20,16 +21,27 @@ export default function ContractorsPage() {
   const contractors = useStore((s) => s.contractors)
   const deals = useStore((s) => s.deals)
   const toast = useToast((s) => s.show)
+  const confirm = useConfirm((s) => s.ask)
   const addContractor = useStore((s) => s.addContractor)
   const deleteContractor = useStore((s) => s.deleteContractor)
   const updateContractor = useStore((s) => s.updateContractor)
 
   const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(emptyForm)
+
+  const openEdit = (c: typeof contractors[0]) => {
+    setForm({
+      name: c.name, trade: c.trade, phone: c.phone, email: c.email,
+      rating: String(c.rating), dealId: c.dealId || '', totalPaid: String(c.totalPaid), status: c.status,
+    })
+    setEditingId(c.id)
+    setShowForm(true)
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    addContractor({
+    const payload = {
       name: form.name,
       trade: form.trade,
       phone: form.phone,
@@ -38,10 +50,17 @@ export default function ContractorsPage() {
       dealId: form.dealId || undefined,
       totalPaid: Number(form.totalPaid) || 0,
       status: form.status,
-    })
+    }
+    if (editingId) {
+      updateContractor(editingId, payload)
+      toast('Contractor updated')
+    } else {
+      addContractor(payload)
+      toast('Contractor added')
+    }
     setForm(emptyForm)
+    setEditingId(null)
     setShowForm(false)
-    toast('Contractor added')
   }
 
   const dealAddress = (id?: string) => deals.find((d) => d.id === id)?.address
@@ -54,7 +73,7 @@ export default function ContractorsPage() {
           <p className="text-gray-500 text-sm mt-1">Store quotes, track payments, and rate performance.</p>
         </div>
         <button
-          onClick={() => setShowForm(true)}
+          onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true) }}
           className="bg-blue-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors font-medium text-sm"
         >
           <Plus className="w-4 h-4" />
@@ -70,7 +89,7 @@ export default function ContractorsPage() {
             className="bg-white rounded-xl p-6 w-full max-w-lg"
           >
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold">Add Contractor</h3>
+              <h3 className="text-lg font-bold">{editingId ? 'Edit Contractor' : 'Add Contractor'}</h3>
               <button type="button" onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600">
                 <X className="w-5 h-5" />
               </button>
@@ -141,7 +160,7 @@ export default function ContractorsPage() {
             </div>
             <div className="flex justify-end gap-3 mt-6">
               <button type="button" onClick={() => setShowForm(false)} className="btn-secondary">Cancel</button>
-              <button type="submit" className="btn-primary">Add Contractor</button>
+              <button type="submit" className="btn-primary">{editingId ? "Save Changes" : "Add Contractor"}</button>
             </div>
           </form>
         </div>
@@ -155,9 +174,14 @@ export default function ContractorsPage() {
                 <h3 className="font-bold text-gray-900">{c.name}</h3>
                 <p className="text-sm text-gray-500">{c.trade}</p>
               </div>
-              <button onClick={() => { deleteContractor(c.id); toast('Contractor removed', 'info') }} className="text-gray-400 hover:text-red-600">
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button onClick={() => openEdit(c)} className="text-gray-400 hover:text-blue-600 p-1" title="Edit">
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button onClick={() => confirm({ message: `Remove ${c.name} from your contractors?`, confirmLabel: 'Remove', onConfirm: () => { deleteContractor(c.id); toast('Contractor removed', 'info') } })} className="text-gray-400 hover:text-red-600 p-1" title="Delete">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center gap-1 mb-3">
@@ -205,7 +229,16 @@ export default function ContractorsPage() {
       </div>
 
       {contractors.length === 0 && (
-        <div className="card text-center py-12 text-gray-500">No contractors yet. Add your first one to get started.</div>
+        <div className="card text-center py-16">
+          <div className="w-14 h-14 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="w-7 h-7 text-purple-500" />
+          </div>
+          <h3 className="font-semibold text-gray-900 mb-1">No contractors yet</h3>
+          <p className="text-gray-500 text-sm mb-5 max-w-sm mx-auto">Add the contractors and vendors you work with to track quotes, payments, and performance across your deals.</p>
+          <button onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true) }} className="btn-primary inline-flex items-center gap-2 text-sm">
+            <Plus className="w-4 h-4" /> Add Your First Contractor
+          </button>
+        </div>
       )}
     </div>
   )

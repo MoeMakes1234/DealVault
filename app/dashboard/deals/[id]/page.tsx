@@ -10,6 +10,7 @@ import {
 import { useStore, BudgetCategory, TimelineTask, Unit, Investor } from '@/lib/store'
 import { useToast } from '@/lib/toast'
 import { fmtCompact } from '@/lib/format'
+import { useConfirm } from '@/components/ConfirmDialog'
 
 const categoryLabels: Record<BudgetCategory, string> = {
   acquisition: 'Acquisition', demo: 'Demolition', framing: 'Framing', electrical: 'Electrical',
@@ -29,6 +30,7 @@ export default function DealDetailPage() {
   const router = useRouter()
   const dealId = params.id as string
   const toast = useToast((s) => s.show)
+  const confirm = useConfirm((s) => s.ask)
 
   const deal = useStore((s) => s.deals.find((d) => d.id === dealId))
   const budgetItems = useStore((s) => s.budgetItems.filter((b) => b.dealId === dealId))
@@ -303,7 +305,7 @@ export default function DealDetailPage() {
                               </select>
                             </td>
                             <td className="py-2.5 text-right">
-                              <button onClick={() => { deleteUnit(dealId, u.id); toast('Unit removed', 'info') }} className="text-gray-300 hover:text-red-600">
+                              <button onClick={() => confirm({ message: `Remove unit ${u.name}?`, confirmLabel: 'Remove', onConfirm: () => { deleteUnit(dealId, u.id); toast('Unit removed', 'info') } })} className="text-gray-300 hover:text-red-600">
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </td>
@@ -372,7 +374,7 @@ export default function DealDetailPage() {
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="text-sm font-semibold">{fmtCompact(inv.amount)}</span>
-                          <button onClick={() => { deleteInvestor(inv.id); toast('Removed from capital stack', 'info') }} className="text-gray-300 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => confirm({ message: `Remove ${inv.name} from the capital stack?`, confirmLabel: 'Remove', onConfirm: () => { deleteInvestor(inv.id); toast('Removed from capital stack', 'info') } })} className="text-gray-300 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -430,7 +432,7 @@ export default function DealDetailPage() {
                             ${item.spent.toLocaleString()} / ${item.budgeted.toLocaleString()}
                           </span>
                           <button
-                            onClick={() => { deleteBudgetItem(item.id); toast('Budget line removed', 'info') }}
+                            onClick={() => confirm({ message: `Remove "${item.label}" from the budget?`, confirmLabel: 'Remove', onConfirm: () => { deleteBudgetItem(item.id); toast('Budget line removed', 'info') } })}
                             className="text-gray-300 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -481,7 +483,7 @@ export default function DealDetailPage() {
                       </button>
                       <div className="flex items-center gap-3">
                         {task.dueDate && <span className="text-xs text-gray-400">{task.dueDate}</span>}
-                        <button onClick={() => { deleteTask(task.id); toast('Task removed', 'info') }} className="text-gray-300 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => confirm({ message: `Remove task "${task.title}"?`, confirmLabel: 'Remove', onConfirm: () => { deleteTask(task.id); toast('Task removed', 'info') } })} className="text-gray-300 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>

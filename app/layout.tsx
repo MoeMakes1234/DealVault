@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import '../styles/globals.css'
 import Toaster from '@/components/Toaster'
+import ConfirmDialog from '@/components/ConfirmDialog'
 
 export const metadata: Metadata = {
   title: 'DealVault — Real Estate Developer & Flipper Platform',
@@ -35,6 +36,7 @@ export default function RootLayout({
       <body className="bg-gray-50">
         {children}
         <Toaster />
+        <ConfirmDialog />
       </body>
     </html>
   )
