@@ -1,10 +1,12 @@
 import Sidebar from '@/components/Sidebar'
 import PageTransition from '@/components/PageTransition'
 import GlobalSearch from '@/components/GlobalSearch'
+import SupabaseSync from '@/components/SupabaseSync'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-gray-50">
+      <SupabaseSync />
       <Sidebar />
       <div className="lg:pl-64">
         {/* Top bar with global search (desktop) */}
